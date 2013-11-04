@@ -1,0 +1,8 @@
+                    orig.b64       pinto pinto/o.b64        orig    pinto.gz   p.gz/orig  pinto/orig
+    barGraph.png        3192        1433         .44        2392        1050         .43         .59
+       heart.png         212          64         .30         159          95         .59         .40
+     K_16x16.png         172          41         .23         128          75         .58         .32
+     K_32x32.png         256          92         .35         192         114         .59         .47
+         map.png        9320        5349         .57        6988        3652         .52         .76
+  robotHorse.png        5056        2952         .58        3792        2047         .53         .77
+       zelda.png         440         272         .61         330         247         .74         .82

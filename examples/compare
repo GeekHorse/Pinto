@@ -1,0 +1,43 @@
+#!/bin/bash
+
+function compare {
+	name=${1%.*}
+
+	convert -colors 63 +dither $1 rgba:- | ../source/utilities/rgbaToPinto/rgbaToPinto `identify -format "%w %h" $1` > "$name.pinto"
+	gzip -9 -c $name.pinto > $name.pinto.gz
+	base64 -w 0 $1 > $1.b64
+
+	sizeb64=$(stat -c%s "$1.b64")
+	sizepinto=$(stat -c%s "$name.pinto")
+	size=$(stat -c%s "$1")
+	sizegz=$(stat -c%s "$name.pinto.gz")
+
+	pintoxb64=`dc -e "2 k $sizepinto $sizeb64 / p"`
+	gzxorig=`dc -e "2 k $sizegz $size / p"`
+	pintoxorig=`dc -e "2 k $sizepinto $size / p"`
+
+	printf "%16s %11d %11d %11s %11d %11d %11s %11s\n" $1 $sizeb64 $sizepinto $pintoxb64 $size $sizegz $gzxorig $pintoxorig
+}
+
+rm -f *.b64
+rm -f *.pinto
+rm -f *.gz
+rm -f *.crushed
+
+if [ ! -e ../source/utilities/rgbaToPinto/rgbaToPinto ]
+then
+	echo "ERROR: rgbaToPinto does not exist."
+	exit -1
+fi
+
+printf "%16s %11s %11s %11s %11s %11s %11s %11s\n" "" "orig.b64" "pinto" "pinto/o.b64" "orig" "pinto.gz" "p.gz/orig" "pinto/orig"
+
+for file in *.png ; do
+	# To make sure we're as fair as possible, we can run the png image through pngcrush
+	#pngcrush -q -rem allb -reduce -brute $file $file.crushed
+	#mv $file.crushed $file
+	compare $file
+done
+
+
+

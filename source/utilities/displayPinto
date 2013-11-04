@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]
+then
+	echo "Usage: displayPinto.sh in.pinto"
+	exit -1
+fi
+
+./pintoToRgba/pintoToRgba rgba $1 | display -depth 8 -size `./pintoToRgba/pintoToRgba getSize $1` rgba:-

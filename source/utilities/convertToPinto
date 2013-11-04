@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]
+then
+	echo "Usage: convertToPinto.sh in.xyz out.pinto"
+	exit -1
+fi
+
+convert -colors 63 +dither $1 rgba:- | ./rgbaToPinto/rgbaToPinto `identify -format "%w %h" $1` > "$2"

@@ -1,0 +1,107 @@
+--- Info -----------------------------------------------------------------------
+What      : Pinto(TM) Image Format
+Version   : 1.0
+Author    : Jeremiah Martell
+Copyright : (C) 2012-2013
+License   : 3-clause BSD
+Website   : http://GeekHorse.com
+
+--- Description ----------------------------------------------------------------
+Pinto is a small image format that only uses printable ASCII characters in it's
+encoding.
+If you don't need the encoding to be text, the image can be made even smaller by
+running it through a standard compression program like gzip.
+
+It supports encoding images:
+  - 4096x4096 or smaller
+  - 63 colors or less
+  - With fully transparent or fully opaque pixels. No partial transparency.
+
+Types of images it IS good at encoding are:
+  - "Pen and paper" drawings.
+  - Diagrams and graphs.
+  - Old school video game sprites.
+  - Icons.
+  - Bitmap fonts.
+  - Pixel Art.
+
+Types of images it IS NOT good at encoding are:
+  - Photographs.
+  - Anti-aliased images.
+  - Images with gradients.
+
+Since the encoding uses only printable 7-bit ascii characters, it can be
+embedded in a plain text file, or a UTF-8 text file. The format doesn't use
+backslashes or double quotes, so it can also be embedded in source code as a
+string.
+
+Example:
+char *heart =
+	"aww2000;00%F454i636g818ejclb?25cjehgfidkbm9o7q5s3u1^&9?Idd?25?Ej";
+
+You may add newline characters in the middle of the format, in case you want the
+format to span multiple lines.
+
+It achieves small sizes by:
+  - Limiting the number of colors to 63.
+  - Limiting transparency to either fully opaque or fully transparent.
+  - Using a reduced color depth of 18 bits per pixel.
+  - Using Run-length encoding (RLE).
+  - Using the Painter's algorithm.
+  - Using a simplified version of the Deflate algorithm.
+
+The only new idea (at least new to me) is to mix RLE with the Painter's
+Algorithm. Each color is RLE encoded individually, and latter colors can paint
+over previous colors. This allows the previous runs to be longer, which means
+they can be encoded smaller.
+
+The library itself is also small, only around 16KB.
+
+Pinto comes with some utilities that can, with ImageMagick, convert images to
+and from the Pinto format. 
+
+Pinto is finished. Only bugfixes will be added should they be needed.
+
+--- Quality --------------------------------------------------------------------
+- Compiled with gcc's -Wall -Werror and -Wextra.
+  Compiles with 0 warnings.
+- Many unit tests guarantee everything works correctly.
+- gcov and lcov is used to make sure we get as much coverage as possible.
+  Current coverage is 100% branch coverage.
+- Valgrind is used to look for memory leaks and memory corruption.
+  There are 0 memory leaks or errors reported.
+- Compiles cleanly against C89, C99, and C11 standards.
+- All code is documented with doxygen comments.
+- All functions are reentrant.
+- Contains no third-party code, written entirely by Jeremiah.
+
+--- Building -------------------------------------------------------------------
+Just run "make".
+
+targets:
+  fast     - build fast version
+  small    - build small version
+  debug    - build debug version
+  debug2   - build debug version that includes PARANOID checks and prints out
+             errors to stdout
+  profile  - build for profiling
+  test     - run tests
+  vtest    - run tests in valgrind
+  coverage - generate coverage report with gcov and lcov
+  clean    - clean up files
+
+Pinto has no dependencies other than standard C libraries. If you have trouble
+building Pinto with the included Makefile, you can manually build Pinto with
+something like this:
+
+cd source/pintoLib
+gcc -c *.c
+ar rcs libPinto.a *.o
+
+The other directories can be built just as easily.
+
+In source/pintoLib/pintoHooks.c, you can change the functions that Pinto calls
+for malloc(), calloc(), realloc(), and free(). This allows Pinto to easily plug
+into a custom memory manager.
+
+--- END ------------------------------------------------------------------------

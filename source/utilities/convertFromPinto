@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]
+then
+	echo "Usage: convertFromPinto.sh in.pinto out.xyz"
+	exit -1
+fi
+
+./pintoToRgba/pintoToRgba rgba $1 | convert -depth 8 -size `./pintoToRgba/pintoToRgba getSize $1` rgba:- $2
