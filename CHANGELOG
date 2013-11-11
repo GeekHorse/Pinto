@@ -1,0 +1,16 @@
+Pinto Changelog:
+	1.0.01
+		2013-NOV-10
+		Fixed off-by-one error in _testGoodDeflate().
+
+		Got too excited and forgot to run tests through valgrind one last time
+		before release. To help me not forget anything again, I created a
+		"preReleaseChecks" script to automate all the checks I need to do before
+		a release.
+	1.0
+		2013-NOV-03
+		COMPLETED
+
+	Pinto is considered finished. No more updates are planned. Only bug fixes
+	will be committed.
+

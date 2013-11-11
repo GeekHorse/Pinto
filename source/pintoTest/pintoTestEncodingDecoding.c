@@ -787,7 +787,7 @@ static int _testGoodDeflate()
 	{
 		TEST_ERR_IF( textIn->string[ i ] != 'A' );
 	}
-	TEST_ERR_IF( textIn->string[ i + 1 ] != '\0' );
+	TEST_ERR_IF( textIn->string[ i ] != '\0' );
 
 	printf( "\n" );
 
