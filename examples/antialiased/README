@@ -1,0 +1,18 @@
+This directory shows that you can create nice looking anti-aliased images from
+pinto images.
+
+Save your image at double size in pinto, then use the pintoImageDownsize()
+function to create a half-size anti-aliased image. The double size pinto image
+is still much smaller than the normal size anti-aliased image.
+
+Also see the pintoToRgba utility's "rbgaDownsize" argument in
+source/utilities/pintoToRgba.
+
+Name                           Size
+----                           ----
+Z_32x32.pinto                  17
+Z_16x16_antialiased.png        109
+
+heart_32x32.pinto              64
+heart_16x16_antialiased.png    188
+

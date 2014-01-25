@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	\file
 	Dynamic text structure functions.
 */
+#define PINTO_FILE_NUMBER 2
 
 /******************************************************************************/
 #include <string.h>
@@ -70,8 +71,8 @@ PINTO_RC pintoTextInit( PintoText **text_A )
 
 
 	/* CODE */
-	PRECOND_ERR_IF( text_A == NULL );
-	PRECOND_ERR_IF( (*text_A) != NULL );
+	ERR_IF( text_A == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( (*text_A) != NULL, PINTO_RC_ERROR_PRECOND );
 
 	PINTO_CALLOC( newText, PintoText, 1 );
 
@@ -144,7 +145,7 @@ PINTO_RC pintoTextAddChar( PintoText *text, char ch )
 
 
 	/* CODE */
-	PRECOND_ERR_IF( text == NULL );
+	ERR_IF( text == NULL, PINTO_RC_ERROR_PRECOND );
 
 	/* only add characters that are valid.
 	   skipping invalid characters allows clients to wordwrap
@@ -321,6 +322,7 @@ PINTO_RC pintoTextAddValue( PintoText *text, s32 value )
 
 
 	/* CODE */
+	PARANOID_ERR_IF( text == NULL );
 	PARANOID_ERR_IF( value < 0 );
 	PARANOID_ERR_IF( value >= (64 * 64 * 64 * 64) );
 

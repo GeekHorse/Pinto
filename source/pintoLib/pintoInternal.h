@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -36,32 +36,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h> /* for NULL */
 
 /******************************************************************************/
-#if ( PRINT_ERR == 1 )
-#define ERR_IF( cond, error_to_return ) if ( (cond) ) { fprintf( stderr, "ERR: %s %d\n", __FILE__, __LINE__ ); fflush( stderr ); rc = error_to_return; goto cleanup; }
-#define ERR_IF_PASSTHROUGH if ( rc != PINTO_RC_SUCCESS ) { fprintf( stderr, "ERR: %s %d\n", __FILE__, __LINE__ ); fflush( stderr ); goto cleanup; }
-#else
-#define ERR_IF( cond, error_to_return ) if ( (cond) ) { rc = error_to_return; goto cleanup; }
-#define ERR_IF_PASSTHROUGH if ( rc != PINTO_RC_SUCCESS ) { goto cleanup; }
-#endif
+#define ERR_IF( cond, error_to_return ) \
+	if ( (cond) ) \
+	{ \
+		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, 0, 0, 0 ); \
+		rc = error_to_return; \
+		goto cleanup; \
+	}
+#define ERR_IF_1( cond, error_to_return, a ) \
+	if ( (cond) ) \
+	{ \
+		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, 0, 0 ); \
+		rc = error_to_return; \
+		goto cleanup; \
+	}
+#define ERR_IF_2( cond, error_to_return, a, b ) \
+	if ( (cond) ) \
+	{ \
+		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, b, 0 ); \
+		rc = error_to_return; \
+		goto cleanup; \
+	}
+#define ERR_IF_3( cond, error_to_return, a, b, c ) \
+	if ( (cond) ) \
+	{ \
+		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, b, c ); \
+		rc = error_to_return; \
+		goto cleanup; \
+	}
 
-/******************************************************************************/
-#ifndef TEST_PRECOND
-#define TEST_PRECOND 1
-#endif
+#define ERR_IF_PASSTHROUGH \
+	ERR_IF( rc != PINTO_RC_SUCCESS, rc );
 
-#if ( TEST_PRECOND == 1 )
-
-#if ( PRINT_ERR == 1 )
-#define PRECOND_ERR_IF( cond ) if ( (cond) ) { fprintf( stderr, "PRECOND_ERR: %s %d\n", __FILE__, __LINE__ ); fflush( stderr ); return PINTO_RC_ERROR_PRECOND; }
-#else
-#define PRECOND_ERR_IF( cond ) if ( (cond) ) { return PINTO_RC_ERROR_PRECOND; }
-#endif
-
-#else
-
-#define PRECOND_ERR_IF( cond )
-
-#endif
 
 /******************************************************************************/
 #ifdef BE_PARANOID

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,7 +53,7 @@ int testMemory();
 int testEncodingDecoding();
 
 /* misc functions */
-void testImageAddRun( PintoImage *image, s32 startIndex, s32 length, unsigned char red, unsigned char green, unsigned char blue );
+void testImageAddRun( PintoImage *image, s32 startIndex, s32 length, u8 red, u8 green, u8 blue );
 
 /******************************************************************************/
 #endif

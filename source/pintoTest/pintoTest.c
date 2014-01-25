@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pintoTestCommon.h"
 
-#include <stdio.h> /* printf(), fflush() */ 
+#include <stdio.h> /* printf(), fprintf(), fflush() */ 
 #include <string.h> /* strcmp() */
 #include <time.h> /* time(), for seeding random number generator */
 
@@ -55,6 +55,8 @@ int main( int argc, char **argv )
 	char flagTestMemory = 0;
 	char flagTestEncodingDecoding = 0;
 
+	char flagTestAnySet = 0;
+
 	time_t timeStart = 0;
 	time_t timeEnd = 0;
 
@@ -64,22 +66,6 @@ int main( int argc, char **argv )
 	printf( "     %s %s\n", PINTO_NAME, PINTO_VERSION_STRING );
 	printf( "     %s\n", PINTO_COPYRIGHT );
 	printf( "\n" );
-
-	if ( argc <= 1 )
-	{
-		printf( "Usage: pintoTest [options]\n" );
-		printf( "  -s <NUMBER>    Seed for random number generator\n" );
-		printf( "  -t <TEST>      Test to run\n" );
-		printf( "                 Possible tests:\n" );
-		printf( "                   all = all tests\n" );
-		printf( "                   pre = preconditions\n" );
-		printf( "                   misc = misc\n" );
-		printf( "                   memory = memory\n" );
-		printf( "                   image = encoding/decoding\n" );
-		printf( "\n" );
-
-		return -1;
-	}
 
 	/* **************************************** */
 	rc = _getArgValue( argc, argv, "-s", &argValue );
@@ -92,9 +78,6 @@ int main( int argc, char **argv )
 		seed = time( NULL );
 	}
 
-	printf( "Using seed: %d\n", seed ); fflush( stdout );
-	srand( seed );
-
 	/* **************************************** */
 	rc = _getArgValue( argc, argv, "-t", &argValue );
 	if ( rc == 0 )
@@ -102,35 +85,61 @@ int main( int argc, char **argv )
 		if ( strcmp( argValue, "all" ) == 0 )
 		{
 			flagTestAll = 1;
+			flagTestAnySet = 1;
 		}
 		else if ( strcmp( argValue, "pre" ) == 0 )
 		{
 			flagTestPreconditions = 1;
+			flagTestAnySet = 1;
 		}
 		else if ( strcmp( argValue, "misc" ) == 0 )
 		{
 			flagTestMisc = 1;
+			flagTestAnySet = 1;
 		}
 		else if ( strcmp( argValue, "memory" ) == 0 )
 		{
 			flagTestMemory = 1;
+			flagTestAnySet = 1;
 		}
 		else if ( strcmp( argValue, "image" ) == 0 )
 		{
 			flagTestEncodingDecoding = 1;
+			flagTestAnySet = 1;
 		}
 		else
 		{
-			printf( "UNKNOWN TEST TO RUN: \"%s\"\n", argValue );
+			fprintf( stderr, "UNKNOWN TEST TO RUN: \"%s\"\n", argValue );
 			TEST_ERR_IF( 1 );
 		}
 	}
+
+	if ( flagTestAnySet == 0 )
+	{
+		fprintf( stderr, "Usage: pintoTest [options]\n" );
+		fprintf( stderr, "  -s <NUMBER>    Seed for random number generator\n" );
+		fprintf( stderr, "  -t <TEST>      Test to run\n" );
+		fprintf( stderr, "                 Possible tests:\n" );
+		fprintf( stderr, "                   all = all tests\n" );
+		fprintf( stderr, "                   pre = preconditions\n" );
+		fprintf( stderr, "                   misc = misc\n" );
+		fprintf( stderr, "                   memory = memory\n" );
+		fprintf( stderr, "                   image = encoding/decoding\n" );
+		fprintf( stderr, "\n" );
+
+		return -1;
+	}
+
+	/* **************************************** */
+	printf( "Using seed: %d\n", seed ); fflush( stdout );
+	srand( seed );
 
 	/* **************************************** */
 	timeStart = time( NULL );
 
 	/* **************************************** */
 	TEST_ERR_IF( sizeof( s32 ) != 4 );
+	TEST_ERR_IF( sizeof( u8 ) != 1 );
 
 	/* **************************************** */
 	if ( flagTestAll || flagTestPreconditions )
@@ -171,7 +180,7 @@ int main( int argc, char **argv )
 	/* CLEANUP */
 	cleanup:
 
-	printf( "FAILED AT %d", rc );
+	printf( "FAILED AT %d\n\n", rc );
 
 	return rc;
 }

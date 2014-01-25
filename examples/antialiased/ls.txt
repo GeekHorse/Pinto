@@ -1,0 +1,9 @@
+total 28
+drwxr-xr-x 2 will will 4096 Jan 18 17:59 .
+drwxr-xr-x 6 will will 4096 Jan 18 17:59 ..
+-rw-r--r-- 1 will will  188 Jan 18 17:51 heart_16x16_antialiased.png
+-rw-r--r-- 1 will will   64 Jan 18 17:49 heart_32x32.pinto
+-rw-r--r-- 1 will will    0 Jan 18 17:59 ls.txt
+-rw-r--r-- 1 will will  405 Jan 18 17:59 README
+-rw-r--r-- 1 will will  109 Jan 18 17:46 Z_16x16_antialiased.png
+-rw-r--r-- 1 will will   17 Jan 18 17:45 Z_32x32.pinto

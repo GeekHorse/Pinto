@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -329,11 +329,15 @@ static int _testBadFormats()
 
 		/* width == 0 */
 		"a0410000121812^",
+		/* width == 4097 */
+		"a=101410000121812^",
 		/* bad width */
 		"a^410000121812^",
 
 		/* height == 0 */
 		"a4010000121812^",
+		/* height == 4097 */
+		"a4=10110000121812^",
 		/* bad height */
 		"a4^10000121812^",
 
@@ -359,15 +363,18 @@ static int _testBadFormats()
 
 		/* bad double values */
 		"a441000<^",
+		"a441000<1^",
 
 		/* bad triple values */
 		"a441000=^",
 		"a441000=1^",
+		"a441000=11^",
 
 		/* bad quad values */
 		"a441000>^",
 		"a441000>1^",
 		"a441000>11^",
+		"a441000>111^",
 
 		/* bad inflate distances */
 		/* 0 */
@@ -455,7 +462,7 @@ static int _testBadImages()
 
 	char *encoding = NULL;
 
-	PintoImage badStackImage = { 1, 1, (unsigned char *)"\0\0\0\0" };
+	PintoImage badStackImage = { 1, 1, (u8 *)"\0\0\0\0" };
 	PintoImage *badHeapImage = NULL;
 
 	s32 i = 0;
@@ -885,6 +892,7 @@ static int _testRandomImages(
 	int rc = 0;
 
 	PintoImage *image = NULL;
+	PintoImage *imageDownsized = NULL;
 	s32 width = 0;
 	s32 height = 0;
 
@@ -894,9 +902,9 @@ static int _testRandomImages(
 
 	s32 colorAmount = 0;
 
-	unsigned char red = 0;
-	unsigned char green = 0;
-	unsigned char blue = 0;
+	u8 red = 0;
+	u8 green = 0;
+	u8 blue = 0;
 
 	s32 marksAmount = 0;
 
@@ -1047,12 +1055,21 @@ static int _testRandomImages(
 
 		/* verify image */
 		TEST_ERR_IF( _testImageVerify( image ) != 0 );
+
+		/* downsize image
+		   No good way to test the result, but we can make sure it doesnt have
+		   memory errors or leaks */
+		if ( image->width >= 2 && image->height >= 2 )
+		{
+			TEST_ERR_IF( pintoImageDownsize( image, &imageDownsized ) != PINTO_RC_SUCCESS );
+		}
  
 		/* free */
 		pintoHookFree( string );
 		string = NULL;
 
 		pintoImageFree( &image );
+		pintoImageFree( &imageDownsized );
 
 		/* *** */
 		if ( i + 1 <= 100 )
@@ -1087,9 +1104,9 @@ static int _testImageVerify( PintoImage *image )
 
 	s32 i = 0;
 
-	unsigned char red = 0;
-	unsigned char green = 0;
-	unsigned char blue = 0;
+	u8 red = 0;
+	u8 green = 0;
+	u8 blue = 0;
 
 
 	/* CODE */

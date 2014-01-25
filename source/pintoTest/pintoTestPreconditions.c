@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -54,11 +54,6 @@ int testPreconditions()
 	/* **************************************** */
 	printf( "Testing preconditions...\n" ); fflush( stdout );
 
-	#if ( ! TEST_PRECOND )
-	printf( "  TEST_PRECOND not defined! Not doing any tests...\n" ); fflush( stdout );
-	goto cleanup;
-	#endif
-
 	TEST_ERR_IF( pintoTextInit( &text1 ) != PINTO_RC_SUCCESS );
 
 	TEST_ERR_IF( pintoImageInit( -1, 10, &image1 ) != PINTO_RC_ERROR_PRECOND );
@@ -87,6 +82,10 @@ int testPreconditions()
 	TEST_ERR_IF( pintoTextInit( &text1 ) != PINTO_RC_ERROR_PRECOND );
 
 	TEST_ERR_IF( pintoTextAddChar( NULL, 'a' ) != PINTO_RC_ERROR_PRECOND );
+
+	TEST_ERR_IF( pintoImageDownsize( NULL, &image1 ) != PINTO_RC_ERROR_PRECOND );
+	TEST_ERR_IF( pintoImageDownsize( image2, NULL ) != PINTO_RC_ERROR_PRECOND );
+	TEST_ERR_IF( pintoImageDownsize( image2, &image2 ) != PINTO_RC_ERROR_PRECOND );
 
 	/* CLEANUP */
 	cleanup:

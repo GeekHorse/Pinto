@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2013 Jeremiah Martell
+Copyright (C) 2013-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -39,9 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define APP_ERR_IF( x ) if ( (x) ) { rc = -__LINE__; goto cleanup; }
 
 /******************************************************************************/
-#define FLAG_PRINT_USAGE 0
-#define FLAG_PRINT_SIZE 1
-#define FLAG_PRINT_RGBA 2
+#define FLAG_PRINT_USAGE         0
+#define FLAG_PRINT_SIZE          1
+#define FLAG_PRINT_RGBA          2
+#define FLAG_PRINT_RGBA_DOWNSIZE 3
 
 /******************************************************************************/
 int main( int argc, char **argv )
@@ -58,6 +59,7 @@ int main( int argc, char **argv )
 	char ch = 0;
 
 	PintoImage *image = NULL;
+	PintoImage *imageDownsize = NULL;
 
 	PINTO_RC pintoRC = PINTO_RC_SUCCESS;
 
@@ -73,29 +75,37 @@ int main( int argc, char **argv )
 		{
 			flag = FLAG_PRINT_RGBA;
 		}
+		else if ( strcmp( argv[ 1 ], "rgbaDownsize" ) == 0 )
+		{
+			flag = FLAG_PRINT_RGBA_DOWNSIZE;
+		}
 	}
 
 	if ( flag == FLAG_PRINT_USAGE )
 	{
-		printf( "pintoToRgba\n" );
-		printf( "Copyright (C) 2013 Jeremiah Martell\n" );
-		printf( "http://GeekHorse.com\n" );
-		printf( "\n" );
-		printf( "pintoToRgba will tell you the size of a pinto image, or output the image's\n" );
-		printf( "rgba data to stdout.\n" );
-		printf( "It helps convert a pinto image into another image format.\n" );
-		printf( "NOTE: \"convert\" mentioned below comes from the free ImageMagick software\n" );
-		printf( "suite, which can be found at: http://www.imagemagick.org\n" );
-		printf( "\n" );
-		printf( "USAGE:\n" );
-		printf( "    pintoToRgba getSize in.pinto\n" );
-		printf( "    pintoToRgba rgba in.pinto\n" );
-		printf( "\n" );
-		printf( "Example 1: To get the size of a pinto image:\n" );
-		printf( "    pintoToRgba getSize in.pinto\n" );
-		printf( "Example 2: To generate a png image from a pinto image:\n" );
-		printf( "    pintoToRgba rgba in.pinto | convert -depth 8 -size WIDTHxHEIGHT rgba:- out.png\n" );
-		printf( "\n" );
+		fprintf( stderr, "pintoToRgba %s\n", PINTO_VERSION_STRING );
+		fprintf( stderr, "Copyright (C) 2013-2014 Jeremiah Martell\n" );
+		fprintf( stderr, "http://GeekHorse.com\n" );
+		fprintf( stderr, "\n" );
+		fprintf( stderr, "pintoToRgba will tell you the size of a pinto image, or output the image's\n" );
+		fprintf( stderr, "rgba data to stdout. It can also create anti-aliased images by downsizing\n" );
+		fprintf( stderr, "the pinto image by half.\n" );
+		fprintf( stderr, "It helps convert a pinto image into another image format.\n" );
+		fprintf( stderr, "NOTE: \"convert\" mentioned below comes from the free ImageMagick software\n" );
+		fprintf( stderr, "suite, which can be found at: http://www.imagemagick.org\n" );
+		fprintf( stderr, "\n" );
+		fprintf( stderr, "USAGE:\n" );
+		fprintf( stderr, "    pintoToRgba getSize in.pinto\n" );
+		fprintf( stderr, "    pintoToRgba rgba in.pinto\n" );
+		fprintf( stderr, "    pintoToRgba rgbaDownsize in.pinto\n" );
+		fprintf( stderr, "\n" );
+		fprintf( stderr, "Example 1: To get the size of a pinto image:\n" );
+		fprintf( stderr, "    pintoToRgba getSize in.pinto\n" );
+		fprintf( stderr, "Example 2: To generate a png image from a pinto image:\n" );
+		fprintf( stderr, "    pintoToRgba rgba in.pinto | convert -depth 8 -size WIDTHxHEIGHT rgba:- out.png\n" );
+		fprintf( stderr, "Example 3: To generate an anti-aliased png image from a pinto image:\n" );
+		fprintf( stderr, "    pintoToRgba rgbaDownsize in.pinto | convert -depth 8 -size HALFWIDTHxHALFHEIGHT rgba:- out.png\n" );
+		fprintf( stderr, "\n" );
 		APP_ERR_IF( 1 );
 	}
 
@@ -138,18 +148,31 @@ int main( int argc, char **argv )
 	{
 		printf( "%dx%d\n", image->width, image->height );
 	}
-	else /* FLAG_PRINT_RGBA */
+	else if ( flag == FLAG_PRINT_RGBA )
 	{
 		/* output to stdout */
 		fwrite( image->rgba, 1, image->width * image->height * 4, stdout );
 	}
-
+	else /* FLAG_PRINT_RGBA_DOWNSIZE */
+	{
+		/* downsize */
+		pintoRC	= pintoImageDownsize( image, &imageDownsize );
+		if ( pintoRC != PINTO_RC_SUCCESS )
+		{
+			fprintf( stderr, "ERROR: pinto image downsize failed! (%s)\n", pintoRCToString( pintoRC ) );
+			APP_ERR_IF( 1 );
+		}
+		
+		/* output to stdout */
+		fwrite( imageDownsize->rgba, 1, imageDownsize->width * imageDownsize->height * 4, stdout );
+	}
 
 
 	/* CLEANUP */
 	cleanup:
 
 	pintoImageFree( &image );
+	pintoImageFree( &imageDownsize );
 
 	if ( fp != NULL )
 	{

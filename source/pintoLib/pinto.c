@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	\file
 	Encoding and decoding functions.
 */
+#define PINTO_FILE_NUMBER 1
 
 /******************************************************************************/
 #include "pinto.h"
@@ -57,7 +58,7 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 
 	PintoText *newText = NULL;
 	PintoText *newTextDeflated = NULL;
-	unsigned char *palette = NULL;
+	u8 *palette = NULL;
 
 	/* This is the indexed image data.
 	   Instead of holding RGB, it holds an index into the palette.
@@ -72,9 +73,9 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 
 	char needToAddStandardHeader = 1;
 
-	unsigned char red = 0;
-	unsigned char green = 0;
-	unsigned char blue = 0;
+	u8 red = 0;
+	u8 green = 0;
+	u8 blue = 0;
 
 	char rleState = 0;
 	s32 rleCount = 0;
@@ -85,19 +86,19 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 
 
 	/* PRECOND */
-	PRECOND_ERR_IF( image == NULL );
-	PRECOND_ERR_IF( string_A == NULL );
-	PRECOND_ERR_IF( (*string_A) != NULL );
+	ERR_IF( image == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( string_A == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( (*string_A) != NULL, PINTO_RC_ERROR_PRECOND );
 
 
 	/* CODE */
 
 	/* check size */
-	ERR_IF( image->width  <= 0, PINTO_RC_ERROR_IMAGE_BAD_SIZE );
-	ERR_IF( image->height <= 0, PINTO_RC_ERROR_IMAGE_BAD_SIZE );
+	ERR_IF_1( image->width  <= 0, PINTO_RC_ERROR_IMAGE_BAD_SIZE, image->width );
+	ERR_IF_1( image->height <= 0, PINTO_RC_ERROR_IMAGE_BAD_SIZE, image->height );
 
-	ERR_IF( image->width  > PINTO_MAX_WIDTH,  PINTO_RC_ERROR_IMAGE_BAD_SIZE );
-	ERR_IF( image->height > PINTO_MAX_HEIGHT, PINTO_RC_ERROR_IMAGE_BAD_SIZE );
+	ERR_IF_1( image->width  > PINTO_MAX_WIDTH,  PINTO_RC_ERROR_IMAGE_BAD_SIZE, image->width );
+	ERR_IF_1( image->height > PINTO_MAX_HEIGHT, PINTO_RC_ERROR_IMAGE_BAD_SIZE, image->height );
 
 	/* malloc data, which is the palette-ized version of the image.
 	   instead of rgba, it'll hold the index of the color, with -1
@@ -105,7 +106,7 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 	PINTO_MALLOC( indexedData, char, image->width * image->height );
 
 	/* determine palette */
-	PINTO_CALLOC( palette, unsigned char, PINTO_MAX_COLORS * 3 );
+	PINTO_CALLOC( palette, u8, PINTO_MAX_COLORS * 3 );
 
 	/* foreach pixel */
 	for ( pixel = 0; pixel < ( image->width * image->height ); pixel += 1 )
@@ -392,9 +393,9 @@ PINTO_RC pintoImageDecodeString( const char *string, PintoImage **image_A )
 
 
 	/* PRECOND */
-	PRECOND_ERR_IF( string == NULL );
-	PRECOND_ERR_IF( image_A == NULL );
-	PRECOND_ERR_IF( (*image_A) != NULL );
+	ERR_IF( string == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( image_A == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( (*image_A) != NULL, PINTO_RC_ERROR_PRECOND );
 
 
 	/* CODE */
@@ -403,10 +404,12 @@ PINTO_RC pintoImageDecodeString( const char *string, PintoImage **image_A )
 	ERR_IF_PASSTHROUGH;
 
 	/* add string to our pintoText */
-	for ( ; (*string) != '\0'; string += 1 )
+	while ( (*string) != '\0' )
 	{
 		rc = pintoTextAddChar( text, (*string) );
 		ERR_IF_PASSTHROUGH;
+
+		string += 1;
 	}
 
 	/* call the text version */
@@ -425,8 +428,8 @@ PINTO_RC pintoImageDecodeString( const char *string, PintoImage **image_A )
 /******************************************************************************/
 /*!
 	\brief Decodes a text into an image.
-	\param[in] text_F The text to be decoded. This will be freed with the
-		pintoHook memory functions.
+	\param[in] text_F The text to be decoded. On success, this will be freed
+		with the pintoHook memory functions.
 	\param[out] image_A On success, the decoded image.
 		Will be allocated with the pintoHook memory functions. The caller is
 		responsible for freeing by passing the image to pintoImageFree().
@@ -454,16 +457,16 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 	s32 height = 0;
 
 	s32 colorAmount = 0;
-	unsigned char *palette = NULL;
+	u8 *palette = NULL;
 
 	char flagOn = 0;
 
 
 	/* PRECOND */
-	PRECOND_ERR_IF( text_F == NULL );
-	PRECOND_ERR_IF( (*text_F) == NULL );
-	PRECOND_ERR_IF( image_A == NULL );
-	PRECOND_ERR_IF( (*image_A) != NULL );
+	ERR_IF( text_F == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( (*text_F) == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( image_A == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( (*image_A) != NULL, PINTO_RC_ERROR_PRECOND );
 
 
 	/* CODE */
@@ -483,15 +486,15 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 		rc = pintoTextGetValue( text, &width );
 		ERR_IF_PASSTHROUGH;
 
-		ERR_IF( width <= 0, PINTO_RC_ERROR_FORMAT_INVALID );
-		PARANOID_ERR_IF( width > PINTO_MAX_WIDTH );
+		ERR_IF_1( width <= 0, PINTO_RC_ERROR_FORMAT_INVALID, width );
+		ERR_IF_1( width > PINTO_MAX_WIDTH, PINTO_RC_ERROR_FORMAT_INVALID, width );
 
 		/* get height */
 		rc = pintoTextGetValue( text, &height );
 		ERR_IF_PASSTHROUGH;
 
-		ERR_IF( height <= 0, PINTO_RC_ERROR_FORMAT_INVALID );
-		PARANOID_ERR_IF( height > PINTO_MAX_HEIGHT );
+		ERR_IF_1( height <= 0, PINTO_RC_ERROR_FORMAT_INVALID, height );
+		ERR_IF_1( height > PINTO_MAX_HEIGHT, PINTO_RC_ERROR_FORMAT_INVALID, height );
 
 		/* allocate new image */
 		rc = pintoImageInit( width, height, &newImage );
@@ -501,12 +504,12 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 		rc = pintoTextGetValue( text, &colorAmount );
 		ERR_IF_PASSTHROUGH;
 
-		ERR_IF( colorAmount > PINTO_MAX_COLORS, PINTO_RC_ERROR_FORMAT_INVALID );
+		ERR_IF_1( colorAmount > PINTO_MAX_COLORS, PINTO_RC_ERROR_FORMAT_INVALID, colorAmount );
 
 		if ( colorAmount > 0 )
 		{
 			/* allocate palette */
-			PINTO_CALLOC( palette, unsigned char, colorAmount * 3 );
+			PINTO_CALLOC( palette, u8, colorAmount * 3 );
 
 			/* read in colors */
 			for ( colorIndex = 0; colorIndex < ( colorAmount * 3 ); colorIndex += 1 )
@@ -566,7 +569,7 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 		}
 		else
 		{
-			ERR_IF( 1, PINTO_RC_ERROR_FORMAT_INVALID );
+			ERR_IF_1( 1, PINTO_RC_ERROR_FORMAT_INVALID, header );
 		}
 
 		/* allocate new image */
@@ -578,7 +581,7 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 		/* allocate palette */
 		/* since this is calloc, our single color will be black, which is
 		   what we want */
-		PINTO_CALLOC( palette, unsigned char, colorAmount * 3 );
+		PINTO_CALLOC( palette, u8, colorAmount * 3 );
 	}
 
 	/* foreach color */
@@ -657,6 +660,8 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 	(*image_A) = newImage;
 	newImage = NULL;
 
+	pintoTextFree( text_F );
+
 
 	/* CLEANUP */
 	cleanup:
@@ -664,7 +669,6 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 	pintoHookFree( palette );
 	palette = NULL;
 
-	pintoTextFree( text_F );
 	pintoTextFree( &text );
 
 	pintoImageFree( &newImage );
@@ -691,10 +695,10 @@ PINTO_RC pintoImageInit( s32 width, s32 height, PintoImage **image_A )
 
 
 	/* PRECOND */
-	PRECOND_ERR_IF( width <= 0 || width > PINTO_MAX_WIDTH );
-	PRECOND_ERR_IF( height <= 0 || height > PINTO_MAX_HEIGHT );
-	PRECOND_ERR_IF( image_A == NULL );
-	PRECOND_ERR_IF( (*image_A) != NULL );
+	ERR_IF_1( width <= 0 || width > PINTO_MAX_WIDTH, PINTO_RC_ERROR_PRECOND, width );
+	ERR_IF_1( height <= 0 || height > PINTO_MAX_HEIGHT, PINTO_RC_ERROR_PRECOND, height );
+	ERR_IF( image_A == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( (*image_A) != NULL, PINTO_RC_ERROR_PRECOND );
 
 
 	/* CODE */
@@ -702,7 +706,7 @@ PINTO_RC pintoImageInit( s32 width, s32 height, PintoImage **image_A )
 	PINTO_CALLOC( newImage, PintoImage, 1 );
 
 	/* allocate rgba */
-	PINTO_CALLOC( newImage->rgba, unsigned char, width * height * 4 );
+	PINTO_CALLOC( newImage->rgba, u8, width * height * 4 );
 
 	newImage->width = width;
 	newImage->height = height;
@@ -1027,6 +1031,124 @@ PINTO_RC pintoSimpleInflate( PintoText **textToInflate_F, PintoText **text_A )
 
 /******************************************************************************/
 /*!
+	\brief Creates a new image half the size.
+	\param[in] imageIn The original image.
+	\param[out] imageOut_A On success, a new image half the size of the original
+		image.
+	\return PINTO_RC
+
+	Used to create anti-aliased images.
+*/
+PINTO_RC pintoImageDownsize( PintoImage *imageIn, PintoImage **imageOut_A )
+{
+	/* DATA */
+	PINTO_RC rc = PINTO_RC_SUCCESS;
+
+	PintoImage *newImage = NULL;
+
+	s32 width = 0;
+	s32 height = 0;
+
+	s32 x = 0;
+	s32 y = 0;
+	s32 newX = 0;
+	s32 newY = 0;
+
+	s32 avg = 0;
+
+
+	/* PRECOND */
+	ERR_IF( imageIn == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( imageOut_A == NULL, PINTO_RC_ERROR_PRECOND );
+	ERR_IF( (*imageOut_A) != NULL, PINTO_RC_ERROR_PRECOND );
+
+
+	/* CODE */
+	width = imageIn->width;
+	height = imageIn->height;
+
+	/* if odd, round down */
+	width = width & (~((s32)1));
+	height = height & (~((s32)1));
+
+	ERR_IF( width == 0, PINTO_RC_ERROR_IMAGE_TOO_SMALL );
+	ERR_IF( height == 0, PINTO_RC_ERROR_IMAGE_TOO_SMALL );
+
+	/* create new image at half size */
+	rc = pintoImageInit( width / 2, height / 2, &newImage );
+	ERR_IF_PASSTHROUGH;
+
+	/* do the downsize */
+	x = 0;
+	newX = 0;
+	while ( x < width )
+	{
+		y = 0;
+		newY = 0;
+		while ( y < height )
+		{
+			/* red */
+			avg = 0;
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) ];
+			avg /= 4;
+			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) ] = avg;
+
+			/* green */
+			avg = 0;
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 1 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 1 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 1 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 1 ];
+			avg /= 4;
+			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) + 1 ] = avg;
+
+			/* blue */
+			avg = 0;
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 2 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 2 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 2 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 2 ];
+			avg /= 4;
+			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) + 2 ] = avg;
+
+			/* alpha */
+			avg = 0;
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 3 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 3 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 3 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 3 ];
+			avg /= 4;
+			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) + 3 ] = avg;
+
+			/* increment */
+			y += 2;
+			newY += 1;
+		}
+
+		/* increment */
+		x += 2;
+		newX += 1;
+	}
+
+
+	/* give back */
+	(*imageOut_A) = newImage;
+	newImage = NULL;
+
+
+	/* CLEANUP */
+	cleanup:
+
+	pintoImageFree( &newImage );
+
+	return rc;
+}
+
+/******************************************************************************/
+/*!
 	\brief Provides a const char string representation for a PINTO_RC
 	\param[in] rc A PINTO_RC value.
 	\return A const char representation of the passed in PINTO_RC.
@@ -1044,15 +1166,20 @@ const char *pintoRCToString( PINTO_RC rc )
 		"Image Bad Size Error",
 		"Image Too Many Colors Error",
 		"Image Partial Transparency Error",
+		"Image Too Small Error",
 		"Format Invalid Error",
 		"Format Too Long Error"
 	};
 
 	static const char *_rcUnknown = "Unknown Error";
 
-	if ( rc >= 0 && rc <= PINTO_RC_MAX )
+	if ( rc >= 0 && rc <= PINTO_RC_STANDARD_ERRORS_MAX )
 	{
 		return _rcStrings[ rc ];
+	}
+	else if ( rc >= PINTO_RC_PINTO_ERRORS_MIN && rc <= PINTO_RC_PINTO_ERRORS_MAX )
+	{
+		return _rcStrings[ PINTO_RC_STANDARD_ERRORS_MAX + rc - PINTO_RC_PINTO_ERRORS_MIN + 1 ];
 	}
 
 	return _rcUnknown;

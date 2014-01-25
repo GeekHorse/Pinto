@@ -1,8 +1,8 @@
 --- Info -----------------------------------------------------------------------
 What      : Pinto(TM) Image Format
-Version   : 1.0.01
+Version   : 1.0.02
 Author    : Jeremiah Martell
-Copyright : (C) 2012-2013
+Copyright : (C) 2012-2014
 License   : 3-clause BSD
 Website   : http://GeekHorse.com
 
@@ -11,6 +11,8 @@ Pinto is a small image format that only uses printable ASCII characters in it's
 encoding.
 If you don't need the encoding to be text, the image can be made even smaller by
 running it through a standard compression program like gzip.
+
+It can compress images down to less than 15% of PNG.
 
 It supports encoding images:
   - 4096x4096 or smaller
@@ -29,6 +31,11 @@ Types of images it IS NOT good at encoding are:
   - Photographs.
   - Anti-aliased images.
   - Images with gradients.
+
+Despite not encoding anti-aliased images well, it can create anti-aliased
+images by downsizing an image to half-size. The double-size Pinto image can
+still be smaller than a half-size PNG. See /examples/antialiased,
+pintoImageDownsize() and the rgbaDownsize option in the utility pintoToRgba.
 
 Since the encoding uses only printable 7-bit ascii characters, it can be
 embedded in a plain text file, or a UTF-8 text file. The format doesn't use
@@ -55,7 +62,7 @@ Algorithm. Each color is RLE encoded individually, and latter colors can paint
 over previous colors. This allows the previous runs to be longer, which means
 they can be encoded smaller.
 
-The library itself is also small, only around 16KB.
+The library itself is also small, only around 17KB.
 
 Pinto comes with some utilities that can, with ImageMagick, convert images to
 and from the Pinto format. 
@@ -102,6 +109,7 @@ The other directories can be built just as easily.
 
 In source/pintoLib/pintoHooks.c, you can change the functions that Pinto calls
 for malloc(), calloc(), realloc(), and free(). This allows Pinto to easily plug
-into a custom memory manager.
+into a custom memory manager. You can also change the function that Pinto calls
+for error logging, so Pinto can plug into your logging system.
 
 --- END ------------------------------------------------------------------------

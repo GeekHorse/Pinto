@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -26,6 +26,9 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/******************************************************************************/
+#define PINTO_FILE_NUMBER 500
 
 /******************************************************************************/
 #include <string.h> /* strcmp */
@@ -107,7 +110,7 @@ int testMemory()
 	s32 j = 0;
 
 	char *spinner = "-\\|/";
-	unsigned char spinnerI = 0;
+	u8 spinnerI = 0;
 
 	s32 OLD_PINTO_TEXT_SIZE_GROWTH = 0;
 
@@ -190,8 +193,10 @@ static PINTO_RC _testFailedMallocs1( s32 test )
 	PINTO_RC rc = PINTO_RC_SUCCESS;
 
 	PintoImage *image1 = NULL;
+	PintoImage *image1Downsized = NULL;
 	PintoImage *image2 = NULL;
 	char *encoding = NULL;
+
 
 
 	/* CODE */
@@ -209,6 +214,10 @@ static PINTO_RC _testFailedMallocs1( s32 test )
 	testImageAddRun( image1, 20, 2, 255, 255, 255 );
 	testImageAddRun( image1, 24, 2, 255, 255, 255 );
 
+	/* downsize */
+	rc = pintoImageDownsize( image1, &image1Downsized );
+	ERR_IF_PASSTHROUGH;
+
 	/* encode */
 	rc = pintoImageEncode( image1, &encoding );
 	ERR_IF_PASSTHROUGH;
@@ -223,6 +232,7 @@ static PINTO_RC _testFailedMallocs1( s32 test )
 	pintoHookFree( encoding );
 	pintoImageFree( &image1 );
 	pintoImageFree( &image2 );
+	pintoImageFree( &image1Downsized );
 
 	return rc;
 }

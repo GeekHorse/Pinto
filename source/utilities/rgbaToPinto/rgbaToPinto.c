@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2013 Jeremiah Martell
+Copyright (C) 2013-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /******************************************************************************/
-#include <stdlib.h> /* atoi, malloc, free */
-#include <stdio.h>  /* fread */
+#include <stdlib.h> /* strtol, malloc, free */
+#include <stdio.h>  /* fread, printf, fprintf */
 
 #include "pinto.h"
 
@@ -46,32 +46,40 @@ int main( int argc, char **argv )
 	s32 height = 0;
 
 	PintoImage *image = NULL;
+
+	s32 i = 0;
+
 	char *string = NULL;
 
 	PINTO_RC pintoRC = PINTO_RC_SUCCESS;
 
 
 	/* CODE */
-	if ( argc != 3 )
+	if ( argc != 3 && argc != 4 )
 	{
-		printf( "rgbaToPinto\n" );
-		printf( "Copyright (C) 2013 Jeremiah Martell\n" );
-		printf( "http://GeekHorse.com\n" );
-		printf( "\n" );
-		printf( "rgbaToPinto takes rgba data from stdin and outputs pinto data to stdout.\n" );
-		printf( "It helps convert another image format into a pinto image.\n" );
-		printf( "NOTE: \"identify\" and \"convert\" mentioned below come from the free\n" );
-		printf( "ImageMagick software suite, which can be found at:\n" );
-		printf( "http://www.imagemagick.org\n" );
-		printf( "\n" );
-		printf( "USAGE:\n" );
-		printf( "    rgbaToPinto width height\n" );
-		printf( "\n" );
-		printf( "Example 1: To get the size of a png image:\n" );
-		printf( "    identify in.png\n" );
-		printf( "Example 2: To generate a pinto image from a png image:\n" );
-		printf( "    convert -colors 63 +dither in.png rgba:- | rgbaToPinto WIDTH HEIGHT > out.pinto.\n" );
-		printf( "\n" );
+		fprintf( stderr, "rgbaToPinto %s\n", PINTO_VERSION_STRING );
+		fprintf( stderr, "Copyright (C) 2013-2014 Jeremiah Martell\n" );
+		fprintf( stderr, "http://GeekHorse.com\n" );
+		fprintf( stderr, "\n" );
+		fprintf( stderr, "rgbaToPinto takes rgba data from stdin and outputs pinto data to stdout.\n" );
+		fprintf( stderr, "It helps convert another image format into a pinto image.\n" );
+		fprintf( stderr, "NOTE: \"identify\" and \"convert\" mentioned below come from the free\n" );
+		fprintf( stderr, "ImageMagick software suite, which can be found at:\n" );
+		fprintf( stderr, "http://www.imagemagick.org\n" );
+		fprintf( stderr, "\n" );
+		fprintf( stderr, "USAGE:\n" );
+		fprintf( stderr, "    rgbaToPinto width height\n" );
+		fprintf( stderr, "    rgbaToPinto width height blackOnly\n" );
+		fprintf( stderr, "\n" );
+		fprintf( stderr, "Example 1: To get the size of a png image:\n" );
+		fprintf( stderr, "    identify in.png\n" );
+		fprintf( stderr, "Example 2: To generate a pinto image from a png image:\n" );
+		fprintf( stderr, "    convert -colors 63 +dither in.png rgba:- | rgbaToPinto WIDTH HEIGHT > out.pinto.\n" );
+		fprintf( stderr, "Example 3: To generate a pinto image from the black pixels in a png image:\n" );
+		fprintf( stderr, "           Useful when drawing black on white, but you want the white pixels\n" );
+		fprintf( stderr, "           to be transparent. Which could help generating black bitmap fonts.\n" );
+		fprintf( stderr, "    convert in.png rgba:- | rgbaToPinto WIDTH HEIGHT 1 > out.pinto.\n" );
+		fprintf( stderr, "\n" );
 		APP_ERR_IF( 1 );
 	}
 
@@ -118,6 +126,27 @@ int main( int argc, char **argv )
 	{
 		fprintf( stderr, "ERROR: Reading from stdin failed!\n" );
 		APP_ERR_IF( 1 );
+	}
+
+	/* blackOnly? */
+	if ( argc == 4 )
+	{
+		while ( i < (width * height * 4) )
+		{
+			if ( image->rgba[ i + 3 ] != 0 )
+			{
+				if (    image->rgba[ i     ] != 0
+				     || image->rgba[ i + 1 ] != 0
+				     || image->rgba[ i + 2 ] != 0
+				   )
+				{
+					image->rgba[ i + 3 ] = 0;
+				}
+			}
+
+			/* increment */
+			i += 4;
+		}
 	}
 	
 	/* convert to pinto */

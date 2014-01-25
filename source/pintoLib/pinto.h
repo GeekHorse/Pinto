@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012-2013 Jeremiah Martell
+Copyright (C) 2012-2014 Jeremiah Martell
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,36 +37,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /******************************************************************************/
 #define PINTO_NAME "Pinto"
 
-#define PINTO_COPYRIGHT "Copyright (C) 2012-2013 Jeremiah Martell"
+#define PINTO_COPYRIGHT "Copyright (C) 2012-2014 Jeremiah Martell"
 
-#define PINTO_VERSION_STRING "1.0.01"
-#define PINTO_VERSION 1001
-#define PINTO_VERSION_MAJOR  ( PINTO_VERSION / 1000 )
-#define PINTO_VERSION_MINOR  ( ( PINTO_VERSION / 100 ) % 10 )
-#define PINTO_VERSION_BUGFIX ( PINTO_VERSION % 100 )
+#define PINTO_VERSION_STRING "1.0.02"
+#define PINTO_VERSION 10021
+#define PINTO_VERSION_MAJOR       ( PINTO_VERSION / 10000 )
+#define PINTO_VERSION_MINOR       ( ( PINTO_VERSION / 1000 ) % 10 )
+#define PINTO_VERSION_SUBMINOR    ( ( PINTO_VERSION / 10 ) % 100 )
+#define PINTO_VERSION_FINAL       ( PINTO_VERSION % 10 )
 
 /******************************************************************************/
-typedef enum
-{
-	PINTO_RC_SUCCESS = 0,
+/* This defines s32 as a signed 32-bit integer */
+#define s32 int
+/* This defines u8 as an unsigned 8-bit integer */
+#define u8  unsigned char
 
-	PINTO_RC_ERROR_PRECOND = 1,
-	PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED = 2,
-	PINTO_RC_ERROR_STANDARD_LIBRARY_ERROR = 3,
+/******************************************************************************/
+#define PINTO_RC s32
 
-	PINTO_RC_ERROR_IMAGE_BAD_SIZE = 4,
-	PINTO_RC_ERROR_IMAGE_TOO_MANY_COLORS = 5,
-	PINTO_RC_ERROR_IMAGE_PARTIAL_TRANSPARENCY = 6,
-	PINTO_RC_ERROR_FORMAT_INVALID = 7,
-	PINTO_RC_ERROR_FORMAT_TOO_LONG = 8,
+/******************************************************************************/
+#define PINTO_LIBRARY_NUMBER 1000
 
-	/* This must be the same value as the previous enum */
-	PINTO_RC_MAX = 8,
+/******************************************************************************/
+/* standard rc values */
+#define PINTO_RC_SUCCESS 0
 
-	/* Never used, but forces the enum type signed, so we
-	   can be more defensive in pintoRCToString */
-	PINTO_RC_ERROR_UNKNOWN = -1
-} PINTO_RC;
+#define PINTO_RC_ERROR_PRECOND                  1
+#define PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED 2
+#define PINTO_RC_ERROR_STANDARD_LIBRARY_ERROR   3
+
+/* This must be kept in sync with the above defines */
+#define PINTO_RC_STANDARD_ERRORS_MAX            3
+
+/* Pinto specific rc values */
+#define PINTO_RC_ERROR_IMAGE_BAD_SIZE             1001
+#define PINTO_RC_ERROR_IMAGE_TOO_MANY_COLORS      1002
+#define PINTO_RC_ERROR_IMAGE_PARTIAL_TRANSPARENCY 1003
+#define PINTO_RC_ERROR_IMAGE_TOO_SMALL            1004
+#define PINTO_RC_ERROR_FORMAT_INVALID             1005
+#define PINTO_RC_ERROR_FORMAT_TOO_LONG            1006
+
+/* These must be kept in sync with the above defines */
+#define PINTO_RC_PINTO_ERRORS_MIN                 1001
+#define PINTO_RC_PINTO_ERRORS_MAX                 1006
+
 
 /******************************************************************************/
 /* NOTE: You can not simply modify these if you want pintoLib to handle more
@@ -79,10 +93,6 @@ typedef enum
 #define PINTO_MAX_HEIGHT 4096
 
 /******************************************************************************/
-/* This defines s32 as a signed 32-bit integer */
-#define s32 int
-
-/******************************************************************************/
 /*! Image structure */
 typedef struct
 {
@@ -91,17 +101,25 @@ typedef struct
 	/*! Height */
 	s32 height;
 	/*! Red, Green, Blue, and Alpha data. Size is (width * height * 4) */
-	unsigned char *rgba;
+	u8 *rgba;
 } PintoImage;
 
 typedef struct PintoText_STRUCT PintoText;
 
 /******************************************************************************/
 /* pintoHooks.c */
+/* These function pointers will be used by Pinto. You can use them to plug
+   Pinto into your own memory management system. */
 extern void *(*pintoHookMalloc)( size_t size );
 extern void *(*pintoHookCalloc)( size_t nmemb, size_t size );
 extern void *(*pintoHookRealloc)( void *ptr, size_t size );
 extern void (*pintoHookFree)( void *ptr );
+
+/* This function pointer is used by Pinto to log errors. Not really useful for
+   end-users of the library, but useful for developers. The default function
+   prints to stderr, but you can change this to plug Pinto into your own
+   logging system. */
+extern void (*pintoHookLog)( s32 library, s32 file, s32 line, s32 rc, s32 a, s32 b, s32 c );
 
 /******************************************************************************/
 /* pinto.c */
@@ -112,6 +130,8 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A );
 
 PINTO_RC pintoImageInit( s32 width, s32 height, PintoImage **image_A );
 void pintoImageFree( PintoImage **image_F );
+
+PINTO_RC pintoImageDownsize( PintoImage *imageIn, PintoImage **imageOut_A );
 
 const char *pintoRCToString( PINTO_RC rc );
 
