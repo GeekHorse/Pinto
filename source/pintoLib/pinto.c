@@ -1155,7 +1155,7 @@ PINTO_RC pintoImageDownsize( PintoImage *imageIn, PintoImage **imageOut_A )
 */
 const char *pintoRCToString( PINTO_RC rc )
 {
-	static const char *_rcStrings[] =
+	static const char *rcStrings[] =
 	{
 		"Success",
 
@@ -1171,17 +1171,19 @@ const char *pintoRCToString( PINTO_RC rc )
 		"Format Too Long Error"
 	};
 
-	static const char *_rcUnknown = "Unknown Error";
+	static const char *rcUnknown = "Unknown Error";
 
+	/* standard errors */
 	if ( rc >= 0 && rc <= PINTO_RC_STANDARD_ERRORS_MAX )
 	{
-		return _rcStrings[ rc ];
+		return rcStrings[ rc ];
 	}
+	/* pinto errors */
 	else if ( rc >= PINTO_RC_PINTO_ERRORS_MIN && rc <= PINTO_RC_PINTO_ERRORS_MAX )
 	{
-		return _rcStrings[ PINTO_RC_STANDARD_ERRORS_MAX + rc - PINTO_RC_PINTO_ERRORS_MIN + 1 ];
+		return rcStrings[ PINTO_RC_STANDARD_ERRORS_MAX + rc - PINTO_RC_PINTO_ERRORS_MIN + 1 ];
 	}
 
-	return _rcUnknown;
+	return rcUnknown;
 }
 

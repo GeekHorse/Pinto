@@ -36,13 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pintoTestCommon.h"
 
 /******************************************************************************/
-static int _testGoodImages();
-static int _testGoodFormats();
-static int _testBadImages();
-static int _testBadFormats();
-static int _testGoodDeflate();
-static int _testBadDeflate();
-static int _testRandomImages(
+static int testGoodImages();
+static int testGoodFormats();
+static int testBadImages();
+static int testBadFormats();
+static int testGoodDeflate();
+static int testBadDeflate();
+static int testRandomImages(
 	char *description,
 	int numberOfImages,
 	int maxNumberOfColors,
@@ -50,7 +50,7 @@ static int _testRandomImages(
 	int simpleSizes,
 	int square,
 	int maxSize );
-static int _testImageVerify( PintoImage *image );
+static int testImageVerify( PintoImage *image );
 
 /******************************************************************************/
 int testEncodingDecoding()
@@ -62,16 +62,16 @@ int testEncodingDecoding()
 	/* CODE */
 	printf( "Testing encoding/decoding...\n" ); fflush( stdout );
 
-	TEST_ERR_IF( _testGoodImages() != 0 );
-	TEST_ERR_IF( _testGoodFormats() != 0 );
-	TEST_ERR_IF( _testGoodDeflate() != 0 );
-	TEST_ERR_IF( _testBadImages() != 0 );
-	TEST_ERR_IF( _testBadFormats() != 0 );
-	TEST_ERR_IF( _testBadDeflate() != 0 );
-	TEST_ERR_IF( _testRandomImages( "Testing 100 random \"simple\" square images...", 100, 1, 1, 1, 1, PINTO_MAX_WIDTH ) != 0 );
-	TEST_ERR_IF( _testRandomImages( "Testing 100 random \"simple\" non-square images...", 100, 1, 1, 1, 0, PINTO_MAX_WIDTH ) != 0 );
-	TEST_ERR_IF( _testRandomImages( "Testing 100000 random small images...", 100000, 3, 0, 0, 0, 32 ) != 0 );
-	TEST_ERR_IF( _testRandomImages( "Testing 100 random worst case images...", 100, PINTO_MAX_COLORS, 0, 0, 0, PINTO_MAX_WIDTH ) != 0 );
+	TEST_ERR_IF( testGoodImages() != 0 );
+	TEST_ERR_IF( testGoodFormats() != 0 );
+	TEST_ERR_IF( testGoodDeflate() != 0 );
+	TEST_ERR_IF( testBadImages() != 0 );
+	TEST_ERR_IF( testBadFormats() != 0 );
+	TEST_ERR_IF( testBadDeflate() != 0 );
+	TEST_ERR_IF( testRandomImages( "Testing 100 random \"simple\" square images...", 100, 1, 1, 1, 1, PINTO_MAX_WIDTH ) != 0 );
+	TEST_ERR_IF( testRandomImages( "Testing 100 random \"simple\" non-square images...", 100, 1, 1, 1, 0, PINTO_MAX_WIDTH ) != 0 );
+	TEST_ERR_IF( testRandomImages( "Testing 100000 random small images...", 100000, 3, 0, 0, 0, 32 ) != 0 );
+	TEST_ERR_IF( testRandomImages( "Testing 100 random worst case images...", 100, PINTO_MAX_COLORS, 0, 0, 0, PINTO_MAX_WIDTH ) != 0 );
 
 
 	/* CLEANUP */
@@ -81,7 +81,7 @@ int testEncodingDecoding()
 }
 
 /******************************************************************************/
-static int _testGoodImages()
+static int testGoodImages()
 {
 	/* DATA */
 	int rc = 0;
@@ -97,61 +97,61 @@ static int _testGoodImages()
 
 	/* 1x1 transparent image */
 	TEST_ERR_IF( pintoImageInit( 1, 1, &image ) != PINTO_RC_SUCCESS );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 	
 	/* 1x1 white image */
 	TEST_ERR_IF( pintoImageInit( 1, 1, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 0, 1, 255, 255, 255 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
 	/* 1x1 black image */
 	TEST_ERR_IF( pintoImageInit( 1, 1, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 0, 1, 0, 0, 0 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
 	/* 32x32 transparent image */
 	TEST_ERR_IF( pintoImageInit( 32, 32, &image ) != PINTO_RC_SUCCESS );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
 	/* 32x32 white image */
 	TEST_ERR_IF( pintoImageInit( 32, 32, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 0, 32 * 32, 255, 255, 255 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
 	/* MAXxMAX transparent */
 	TEST_ERR_IF( pintoImageInit( PINTO_MAX_WIDTH, PINTO_MAX_HEIGHT, &image ) != PINTO_RC_SUCCESS );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
 	/* MAXxMAX white */
 	TEST_ERR_IF( pintoImageInit( PINTO_MAX_WIDTH, PINTO_MAX_HEIGHT, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 0, PINTO_MAX_WIDTH * PINTO_MAX_HEIGHT, 255, 255, 255 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
 	/* MAXxMAX first pixel transparent, remaining pixels white */
 	TEST_ERR_IF( pintoImageInit( PINTO_MAX_WIDTH, PINTO_MAX_HEIGHT, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 1, ( PINTO_MAX_WIDTH * PINTO_MAX_HEIGHT ) - 1, 255, 255, 255 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
 	/* MAXxMAX last pixel transparent, remaining pixels white */
 	TEST_ERR_IF( pintoImageInit( PINTO_MAX_WIDTH, PINTO_MAX_HEIGHT, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 0, ( PINTO_MAX_WIDTH * PINTO_MAX_HEIGHT ) - 1, 255, 255, 255 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
@@ -159,7 +159,7 @@ static int _testGoodImages()
 	TEST_ERR_IF( pintoImageInit( PINTO_MAX_WIDTH, PINTO_MAX_HEIGHT, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 0, 1, 0, 0, 0 );
 	testImageAddRun( image, 1, ( PINTO_MAX_WIDTH * PINTO_MAX_HEIGHT ) - 1, 255, 255, 255 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
@@ -167,7 +167,7 @@ static int _testGoodImages()
 	TEST_ERR_IF( pintoImageInit( PINTO_MAX_WIDTH, PINTO_MAX_HEIGHT, &image ) != PINTO_RC_SUCCESS );
 	testImageAddRun( image, 0, ( PINTO_MAX_WIDTH * PINTO_MAX_HEIGHT ) - 1, 255, 255, 255 );
 	testImageAddRun( image, ( PINTO_MAX_WIDTH * PINTO_MAX_HEIGHT ) - 1, 1, 0, 0, 0 );
-	TEST_ERR_IF( _testImageVerify( image ) != 0 );
+	TEST_ERR_IF( testImageVerify( image ) != 0 );
 	pintoImageFree( &image );
 	printf( "." ); fflush( stdout );
 
@@ -272,7 +272,7 @@ static int _testGoodImages()
 
 
 /******************************************************************************/
-static int _testGoodFormats()
+static int testGoodFormats()
 {
 	/* DATA */
 	int rc = 0;
@@ -314,7 +314,7 @@ static int _testGoodFormats()
 }
 
 /******************************************************************************/
-static int _testBadFormats()
+static int testBadFormats()
 {
 	/* DATA */
 	int rc = 0;
@@ -455,7 +455,7 @@ static int _testBadFormats()
 }
 
 /******************************************************************************/
-static int _testBadImages()
+static int testBadImages()
 {
 	/* DATA */
 	int rc = 0;
@@ -536,7 +536,7 @@ static int _testBadImages()
 }
 
 /******************************************************************************/
-static int _testGoodDeflate()
+static int testGoodDeflate()
 {
 	/* DATA */
 	int rc = 0;
@@ -812,7 +812,7 @@ static int _testGoodDeflate()
 }
 
 /******************************************************************************/
-static int _testBadDeflate()
+static int testBadDeflate()
 {
 	/* DATA */
 	int rc = 0;
@@ -879,7 +879,7 @@ static int _testBadDeflate()
 	image->rgba[ ( y1 * image->width * 4 ) + ( x1 * 4 ) + 2 ] = blue; \
 	image->rgba[ ( y1 * image->width * 4 ) + ( x1 * 4 ) + 3 ] = 255;
 
-static int _testRandomImages(
+static int testRandomImages(
 	char *description,
 	int numberOfImages,
 	int maxNumberOfColors,
@@ -1054,7 +1054,7 @@ static int _testRandomImages(
 		}
 
 		/* verify image */
-		TEST_ERR_IF( _testImageVerify( image ) != 0 );
+		TEST_ERR_IF( testImageVerify( image ) != 0 );
 
 		/* downsize image
 		   No good way to test the result, but we can make sure it doesnt have
@@ -1093,7 +1093,7 @@ static int _testRandomImages(
 }
 
 /******************************************************************************/
-static int _testImageVerify( PintoImage *image )
+static int testImageVerify( PintoImage *image )
 {
 	/* DATA */
 	int rc = 0;

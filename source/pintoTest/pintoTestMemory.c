@@ -40,14 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /******************************************************************************/
 /* which malloc to fail on */
-static s32 _failOnMallocCount = 0;
-static s32 _currentMallocCount = 0;
+static s32 failOnMallocCount = 0;
+static s32 currentMallocCount = 0;
 
 /* malloc/calloc/realloc that will always fail */
-static void *_badMalloc( size_t size )
+static void *badMalloc( size_t size )
 {
-	_currentMallocCount += 1;
-	if ( _currentMallocCount == _failOnMallocCount )
+	currentMallocCount += 1;
+	if ( currentMallocCount == failOnMallocCount )
 	{
 		return NULL;
 	}
@@ -55,10 +55,10 @@ static void *_badMalloc( size_t size )
 	return malloc( size );
 }
 
-static void *_badCalloc( size_t nmemb, size_t size )
+static void *badCalloc( size_t nmemb, size_t size )
 {
-	_currentMallocCount += 1;
-	if ( _currentMallocCount == _failOnMallocCount )
+	currentMallocCount += 1;
+	if ( currentMallocCount == failOnMallocCount )
 	{
 		return NULL;
 	}
@@ -66,10 +66,10 @@ static void *_badCalloc( size_t nmemb, size_t size )
 	return calloc( nmemb, size );
 }
 
-static void *_badRealloc( void *ptr, size_t size )
+static void *badRealloc( void *ptr, size_t size )
 {
-	_currentMallocCount += 1;
-	if ( _currentMallocCount == _failOnMallocCount )
+	currentMallocCount += 1;
+	if ( currentMallocCount == failOnMallocCount )
 	{
 		return NULL;
 	}
@@ -78,10 +78,10 @@ static void *_badRealloc( void *ptr, size_t size )
 }
 
 /******************************************************************************/
-static PINTO_RC _testFailedMallocs1( s32 test );
-static PINTO_RC _testFailedMallocs2( s32 test );
-static PINTO_RC _testFailedMallocs3( s32 test );
-static PINTO_RC _testFailedMallocs4( s32 test );
+static PINTO_RC testFailedMallocs1( s32 test );
+static PINTO_RC testFailedMallocs2( s32 test );
+static PINTO_RC testFailedMallocs3( s32 test );
+static PINTO_RC testFailedMallocs4( s32 test );
 
 typedef struct
 {
@@ -89,12 +89,12 @@ typedef struct
 	s32 numberOfTests;
 } FailedFunc;
 
-static FailedFunc _failedFuncs[] =
+static FailedFunc failedFuncs[] =
 {
-	{ _testFailedMallocs1, 1 },
-	{ _testFailedMallocs2, 1 },
-	{ _testFailedMallocs3, 2 },
-	{ _testFailedMallocs4, 13 },
+	{ testFailedMallocs1, 1 },
+	{ testFailedMallocs2, 1 },
+	{ testFailedMallocs3, 2 },
+	{ testFailedMallocs4, 13 },
 	{ NULL, 0 }
 };
 
@@ -123,30 +123,30 @@ int testMemory()
 	/* testing bad mallocs */
 	printf( "  Testing bad mallocs...\n" ); fflush( stdout );
 
-	pintoHookMalloc = _badMalloc;
-	pintoHookCalloc = _badCalloc;
-	pintoHookRealloc = _badRealloc;
+	pintoHookMalloc = badMalloc;
+	pintoHookCalloc = badCalloc;
+	pintoHookRealloc = badRealloc;
 
 	OLD_PINTO_TEXT_SIZE_GROWTH = PINTO_TEXT_SIZE_GROWTH;
 	PINTO_TEXT_SIZE_GROWTH = 1;
 
 	i = 0;
-	while ( _failedFuncs[ i ].func != NULL )
+	while ( failedFuncs[ i ].func != NULL )
 	{
 		j = 0;
-		while ( j < _failedFuncs[ i ].numberOfTests )
+		while ( j < failedFuncs[ i ].numberOfTests )
 		{
-			_failOnMallocCount = 0;
+			failOnMallocCount = 0;
 
 			do
 			{
 				spinnerI += 1;
-				printf( "\r%d: %d of %d %c", i, j, _failedFuncs[ i ].numberOfTests - 1, spinner[ spinnerI % 4 ]  ); fflush( stdout );
+				printf( "\r%d: %d of %d %c", i, j, failedFuncs[ i ].numberOfTests - 1, spinner[ spinnerI % 4 ]  ); fflush( stdout );
 
-				_currentMallocCount = 0;
-				_failOnMallocCount += 1;
+				currentMallocCount = 0;
+				failOnMallocCount += 1;
 
-				rc = _failedFuncs[ i ].func( j );
+				rc = failedFuncs[ i ].func( j );
 			}
 			while ( rc == PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED );
 
@@ -187,7 +187,7 @@ int testMemory()
 }
 
 /******************************************************************************/
-static PINTO_RC _testFailedMallocs1( s32 test )
+static PINTO_RC testFailedMallocs1( s32 test )
 {
 	/* DATA */
 	PINTO_RC rc = PINTO_RC_SUCCESS;
@@ -238,7 +238,7 @@ static PINTO_RC _testFailedMallocs1( s32 test )
 }
 
 /******************************************************************************/
-static PINTO_RC _testFailedMallocs2( s32 test )
+static PINTO_RC testFailedMallocs2( s32 test )
 {
 	/* DATA */
 	PINTO_RC rc = PINTO_RC_SUCCESS;
@@ -292,7 +292,7 @@ static PINTO_RC _testFailedMallocs2( s32 test )
 }
 
 /******************************************************************************/
-static PINTO_RC _testFailedMallocs3( s32 test )
+static PINTO_RC testFailedMallocs3( s32 test )
 {
 	/* DATA */
 	PINTO_RC rc = PINTO_RC_SUCCESS;
@@ -338,7 +338,7 @@ static PINTO_RC _testFailedMallocs3( s32 test )
 }
 
 /******************************************************************************/
-static PINTO_RC _testFailedMallocs4( s32 test )
+static PINTO_RC testFailedMallocs4( s32 test )
 {
 	/* DATA */
 	PINTO_RC rc = PINTO_RC_SUCCESS;

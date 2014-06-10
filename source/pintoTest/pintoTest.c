@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <time.h> /* time(), for seeding random number generator */
 
 /******************************************************************************/
-static int _getArgValue( int argc, char **argv, char *key, char **value );
+static int getArgValue( int argc, char **argv, char *key, char **value );
 
 /******************************************************************************/
 int main( int argc, char **argv )
@@ -68,7 +68,7 @@ int main( int argc, char **argv )
 	printf( "\n" );
 
 	/* **************************************** */
-	rc = _getArgValue( argc, argv, "-s", &argValue );
+	rc = getArgValue( argc, argv, "-s", &argValue );
 	if ( rc == 0 )
 	{
 		seed = strtol( argValue, NULL, 10 );
@@ -79,7 +79,7 @@ int main( int argc, char **argv )
 	}
 
 	/* **************************************** */
-	rc = _getArgValue( argc, argv, "-t", &argValue );
+	rc = getArgValue( argc, argv, "-t", &argValue );
 	if ( rc == 0 )
 	{
 		if ( strcmp( argValue, "all" ) == 0 )
@@ -186,7 +186,7 @@ int main( int argc, char **argv )
 }
 
 /******************************************************************************/
-static int _getArgValue( int argc, char **argv, char *key, char **value )
+static int getArgValue( int argc, char **argv, char *key, char **value )
 {
 	/* DATA */
 	int i = 0;
