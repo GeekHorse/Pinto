@@ -48,9 +48,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /******************************************************************************/
 /* This defines s32 as a signed 32-bit integer */
+#ifndef s32
 #define s32 int
+#endif
 /* This defines u8 as an unsigned 8-bit integer */
+#ifndef u8
 #define u8  unsigned char
+#endif
 
 /******************************************************************************/
 #define PINTO_RC s32

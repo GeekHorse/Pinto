@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PINTO_FILE_NUMBER 2
 
 /******************************************************************************/
-#include <string.h>
-
 #include "pinto.h"
 #include "pintoInternal.h"
 

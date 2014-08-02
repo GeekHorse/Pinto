@@ -2,7 +2,7 @@
 
 if [ $# -ne 2 ]
 then
-	echo "Usage: convertFromPinto.sh in.pinto out.xyz"
+	echo "Usage: convertFromPinto in.pinto out.xyz"
 	exit -1
 fi
 

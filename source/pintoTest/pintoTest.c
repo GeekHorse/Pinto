@@ -200,7 +200,7 @@ static int getArgValue( int argc, char **argv, char *key, char **value )
 			i += 1;
 			if ( i >= argc )
 			{
-				printf( "ERROR: Command line argument \"%s\" had no value.\n", key );
+				fprintf( stderr, "ERROR: Command line argument \"%s\" had no value.\n", key );
 				return -1;
 			}
 
