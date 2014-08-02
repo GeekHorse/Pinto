@@ -1089,37 +1089,37 @@ PINTO_RC pintoImageDownsize( PintoImage *imageIn, PintoImage **imageOut_A )
 		{
 			/* red */
 			avg = 0;
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) ];
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) ];
 			avg /= 4;
-			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) ] = avg;
+			newImage->rgba[ ( newY * (imageIn->width / 2) * 4 ) + ( newX * 4 ) ] = avg;
 
 			/* green */
 			avg = 0;
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 1 ];
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 1 ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 1 ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 1 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) + 1 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) + 1 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) + 1 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) + 1 ];
 			avg /= 4;
 			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) + 1 ] = avg;
 
 			/* blue */
 			avg = 0;
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 2 ];
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 2 ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 2 ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 2 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) + 2 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) + 2 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) + 2 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) + 2 ];
 			avg /= 4;
 			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) + 2 ] = avg;
 
 			/* alpha */
 			avg = 0;
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 3 ];
-			avg += imageIn->rgba[ ( ( y + 0 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 3 ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 0 ) * 4 ) + 3 ];
-			avg += imageIn->rgba[ ( ( y + 1 ) * width * 4 ) + ( ( x + 1 ) * 4 ) + 3 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) + 3 ];
+			avg += imageIn->rgba[ ( ( y + 0 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) + 3 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 0 ) * 4 ) + 3 ];
+			avg += imageIn->rgba[ ( ( y + 1 ) * imageIn->width * 4 ) + ( ( x + 1 ) * 4 ) + 3 ];
 			avg /= 4;
 			newImage->rgba[ ( newY * (width / 2) * 4 ) + ( newX * 4 ) + 3 ] = avg;
 
