@@ -8,45 +8,15 @@ Pinto Changelog:
 		- Added pintoImageDownsize() to create anti-aliased images.
 		- Added pintoHookLog() function pointer that's used for logging errors.
 
-		Details:
-		- Added pintoImageDownsize() to create anti-aliased images from Pinto
-		  images.
-		- Added an rgbaDownsize option in pintoToRgba to create a half-size
-		  anti-aliased image from a Pinto image.
-		- Added some examples images that show double-size Pinto images are
-		  still smaller than half-size PNG images.
-		- Added a "blackOnly" option to rgbaToPinto to help when creating black
-		  bitmapped fonts.
-		- In utilities and test app, print usage to stderr instead of stdout.
-		- Added new pintoHookLog() hook function that pinto uses to log errors.
-		  This allows pinto to plug into an external log system.
-		- Changed PARANOID_ERR_IF() checks to normal ERR_IF() checks for too
-		  large widths or heights in pintoImageDecodeText(). Also added matching
-		  tests. Too large widths or heights would have still been caught in
-		  pintoImageInit(), but this improves code readability.
-		- Removed PRECOND_ERR_IF() macro and replaced with normal ERR_IF()s.
-		- Added macros ERR_IF_1() and friends so extra information can be
-		  passed to the new pintoHookLog() logging function.
-		- Changed PINTO_RC from enums to defines, and changed their values to be
-		  globally unique against all my other libraries. This allows error
-		  codes to be passed from library to library.
-		- Added missing tests for some kinds of bad double and triple encoded
-		  numbers.
-		- Renamed PINTO_VERSION_BUGFIX to PINTO_VERSION_SUBMINOR.
-		- Added PINTO_VERSION_FINAL that flags whether a version is still being
-		  developed or if it's finished.
-		- Updated copyright dates to 2014.
-
 	1.0.01
 		2013-NOV-10
-		Fixed off-by-one error in _testGoodDeflate().
 
-		Got too excited and forgot to run tests through valgrind one last time
-		before release. To help me not forget anything again, I created a
-		"preReleaseChecks" script to automate all the checks I need to do before
-		a release.
+		Summary:
+		Fixed off-by-one error in _testGoodDeflate().
 
 	1.0
 		2013-NOV-03
+
+		Summary:
 		COMPLETED
 
