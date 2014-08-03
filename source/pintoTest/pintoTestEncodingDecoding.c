@@ -262,7 +262,7 @@ static int testGoodImages()
 
 	pintoImageFree( &image );
 
-	pintoHookFree( encoding );
+	PINTO_HOOK_FREE( encoding );
 	encoding = NULL;
 
 	pintoImageFree( &imageOut );
@@ -805,7 +805,7 @@ static int testGoodDeflate()
 	pintoTextFree( &textIn );
 	pintoTextFree( &textOut );
 
-	pintoHookFree( stringOut );
+	PINTO_HOOK_FREE( stringOut );
 	stringOut = NULL;
 
 	return rc;
@@ -866,7 +866,7 @@ static int testBadDeflate()
 	pintoTextFree( &textIn );
 	pintoTextFree( &textOut );
 
-	pintoHookFree( stringOut );
+	PINTO_HOOK_FREE( stringOut );
 	stringOut = NULL;
 
 	return rc;
@@ -1065,7 +1065,7 @@ static int testRandomImages(
 		}
  
 		/* free */
-		pintoHookFree( string );
+		PINTO_HOOK_FREE( string );
 		string = NULL;
 
 		pintoImageFree( &image );
@@ -1159,7 +1159,7 @@ static int testImageVerify( PintoImage *image )
 	/* CLEANUP */
 	cleanup:
 
-	pintoHookFree( encoding );
+	PINTO_HOOK_FREE( encoding );
 	encoding = NULL;
 
 	pintoImageFree( &imageOut );

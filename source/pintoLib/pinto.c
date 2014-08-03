@@ -46,9 +46,7 @@ extern const char valueToChar[];
 	\brief Encodes an image into the Pinto format.
 	\param[in] image The image to be encoded.
 	\param[out] string_A On success, the string that contains the encoded image.
-		Will be allocated with the pintoHook memory functions. The caller is
-		responsible for freeing by passing to the pintoHook memory free
-		function, or its equivalent.
+		Will be allocated. The caller is responsible for freeing.
 	\return PINTO_RC
 */
 PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
@@ -357,10 +355,10 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 	/* CLEANUP */
 	cleanup:
 
-	pintoHookFree( palette );
+	PINTO_HOOK_FREE( palette );
 	palette = NULL;
 
-	pintoHookFree( indexedData );
+	PINTO_HOOK_FREE( indexedData );
 	indexedData = NULL;
 
 	pintoTextFree( &newText );
@@ -368,7 +366,7 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 
 	pintoImageFree( &verifyImage );
 
-	pintoHookFree( givebackString );
+	PINTO_HOOK_FREE( givebackString );
 	givebackString = NULL;
 
 	return rc;
@@ -379,9 +377,8 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 	\brief Decodes a string into an image.
 	\param[in] string The string to be decoded.
 	\param[out] image_A On success, the decoded image.
-		Will be allocated with the pintoHook memory functions. The caller is
-		responsible for freeing by passing the image to the pintoImageFree()
-		function.
+		Will be allocated. The caller is responsible for freeing by passing the
+		image to the pintoImageFree() function.
 	\return PINTO_RC
 */
 PINTO_RC pintoImageDecodeString( const char *string, PintoImage **image_A )
@@ -428,11 +425,10 @@ PINTO_RC pintoImageDecodeString( const char *string, PintoImage **image_A )
 /******************************************************************************/
 /*!
 	\brief Decodes a text into an image.
-	\param[in] text_F The text to be decoded. On success, this will be freed
-		with the pintoHook memory functions.
+	\param[in] text_F The text to be decoded. On success, this will be freed.
 	\param[out] image_A On success, the decoded image.
-		Will be allocated with the pintoHook memory functions. The caller is
-		responsible for freeing by passing the image to pintoImageFree().
+		Will be allocated. The caller is responsible for freeing by passing the
+		image to pintoImageFree().
 	\return PINTO_RC
 */
 PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
@@ -666,7 +662,7 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 	/* CLEANUP */
 	cleanup:
 
-	pintoHookFree( palette );
+	PINTO_HOOK_FREE( palette );
 	palette = NULL;
 
 	pintoTextFree( &text );
@@ -682,8 +678,8 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 	\param[in] width The width of the image.
 	\param[in] height The height of the image.
 	\param[out] image_A On success, the decoded image.
-		Will be allocated with the pintoHook memory functions. The caller is
-		responsible for freeing by passing the image to pintoImageFree().
+		Will be allocated. The caller is responsible for freeing by passing the
+		image to pintoImageFree().
 	\return PINTO_RC
 */
 PINTO_RC pintoImageInit( s32 width, s32 height, PintoImage **image_A )
@@ -719,7 +715,7 @@ PINTO_RC pintoImageInit( s32 width, s32 height, PintoImage **image_A )
 	/* CLEANUP */
 	cleanup:
 
-	pintoHookFree( newImage );
+	PINTO_HOOK_FREE( newImage );
 	newImage = NULL;
 
 	return rc;
@@ -729,7 +725,7 @@ PINTO_RC pintoImageInit( s32 width, s32 height, PintoImage **image_A )
 /*!
 	\brief Frees an image.
 	\param[in] image_F The image to be freed. Will be freed with
-		pintoHookFree(). On return, image_F will be NULL.
+		PINTO_HOOK_FREE(). On return, image_F will be NULL.
 	\return void.
 */
 void pintoImageFree( PintoImage **image_F )
@@ -740,10 +736,10 @@ void pintoImageFree( PintoImage **image_F )
 		return;
 	}
 
-	pintoHookFree( (*image_F)->rgba );
+	PINTO_HOOK_FREE( (*image_F)->rgba );
 	(*image_F)->rgba = NULL;
 
-	pintoHookFree( (*image_F) );
+	PINTO_HOOK_FREE( (*image_F) );
 	(*image_F) = NULL;
 
 	return;
@@ -754,8 +750,8 @@ void pintoImageFree( PintoImage **image_F )
 	\brief Compresses text with a simple version of deflate.
 	\param[in] textToDeflate_F text to be compressed. On success, will be freed.
 	\param[out] text_A On success, will be compressed text.
-		Will be allocated with the pintoHook memory functions. The caller is
-		responsible for freeing with pintoTextFree().
+		Will be allocated. The caller is responsible for freeing with
+		pintoTextFree().
 	\return PINTO_RC
 */
 PINTO_RC pintoSimpleDeflate( PintoText **textToDeflate_F, PintoText **text_A )
@@ -917,7 +913,7 @@ PINTO_RC pintoSimpleDeflate( PintoText **textToDeflate_F, PintoText **text_A )
 
 	pintoTextFree( &newText );
 
-	pintoHookFree( string );
+	PINTO_HOOK_FREE( string );
 	string = NULL;
 
 	return rc;
@@ -928,8 +924,8 @@ PINTO_RC pintoSimpleDeflate( PintoText **textToDeflate_F, PintoText **text_A )
 	\brief Uncompresses text with a simple version of deflate (inflate here).
 	\param[in] textToDeflate_F text to be uncompressed. On success, will be freed.
 	\param[out] text_A On success, will be uncompressed text.
-		Will be allocated with the pintoHook memory functions. The caller is
-		responsible for freeing with pintoTextFree().
+		Will be allocated. The caller is responsible for freeing with
+		pintoTextFree().
 	\return PINTO_RC
 */
 PINTO_RC pintoSimpleInflate( PintoText **textToInflate_F, PintoText **text_A )

@@ -29,7 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /******************************************************************************/
 #include <string.h> /* strcmp */
-#include <errno.h>  /* errno */
 
 #include "pinto.h"
 #include "pintoInternal.h"
@@ -153,15 +152,6 @@ int testMisc()
 	TEST_ERR_IF( pintoImageInit( 32, 1, &image1 ) != PINTO_RC_SUCCESS );
 	TEST_ERR_IF( pintoImageDownsize( image1, &image2 ) != PINTO_RC_ERROR_IMAGE_TOO_SMALL );
 	pintoImageFree( &image1 );
-
-	/* check log function */
-	/*    rc success */
-	pintoHookLog( 1, 2, 3, 0, 10, 11, 12 );
-	/*    with errno */
-	errno = 1;
-	pintoHookLog( 1, 2, 3, 1, 10, 11, 12 );
-	pintoHookLog( 1, 2, 3, 0, 10, 11, 12 );
-	errno = 0;
 
 	printf( "\n" );
 

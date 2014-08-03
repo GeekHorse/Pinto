@@ -29,12 +29,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /******************************************************************************/
 #include "pinto.h"
+#include "pintoInternal.h"
 
 #include "pintoTestCommon.h"
 
 #include <stdio.h> /* printf(), fprintf(), fflush() */ 
 #include <string.h> /* strcmp() */
 #include <time.h> /* time(), for seeding random number generator */
+#include <errno.h> /* errno, for log function */
+#include <string.h> /* strerror, for log function */
 
 /******************************************************************************/
 static int getArgValue( int argc, char **argv, char *key, char **value );
@@ -57,9 +60,6 @@ int main( int argc, char **argv )
 
 	char flagTestAnySet = 0;
 
-	time_t timeStart = 0;
-	time_t timeEnd = 0;
-
 
 	/* CODE */
 	printf( "Testing:\n" );
@@ -71,7 +71,7 @@ int main( int argc, char **argv )
 	rc = getArgValue( argc, argv, "-s", &argValue );
 	if ( rc == 0 )
 	{
-		seed = strtol( argValue, NULL, 10 );
+		seed = atol( argValue );
 	}
 	else
 	{
@@ -135,9 +135,6 @@ int main( int argc, char **argv )
 	srand( seed );
 
 	/* **************************************** */
-	timeStart = time( NULL );
-
-	/* **************************************** */
 	TEST_ERR_IF( sizeof( s32 ) != 4 );
 	TEST_ERR_IF( sizeof( u8 ) != 1 );
 
@@ -161,14 +158,6 @@ int main( int argc, char **argv )
 	{
 		TEST_ERR_IF( testMemory() != 0 );
 	}
-
-	/* **************************************** */
-	timeEnd = time( NULL );
-
-	printf( "\nTests took %ld:%02ld:%02ld to complete\n",
-		( timeEnd - timeStart ) / (60 * 60),
-		( ( timeEnd - timeStart ) / 60 ) % 60,
-		( timeEnd - timeStart ) % 60 );
 
 	/* **************************************** */
 	/* success! */
@@ -213,4 +202,40 @@ static int getArgValue( int argc, char **argv, char *key, char **value )
 
 	return -2;
 }
+
+/******************************************************************************/
+/*!
+	\brief The log function. Sends log messages to stderr.
+	\param[in] library 
+	\param[in] file
+	\param[in] line
+	\param[in] rc
+	\param[in] a
+	\param[in] b
+	\param[in] c
+	\return void
+*/
+#ifdef PINTO_ENABLE_LOGGING
+void pintoHookLog( s32 library, s32 file, s32 line, s32 rc, s32 a, s32 b, s32 c )
+{
+	if ( errno == 0 )
+	{
+		fprintf( stderr, "%d %d %5d - %2d %s - - %d %d %d\n",
+			library, file, line,
+			rc, ( rc == 0 ? "" : pintoRCToString( rc ) ),
+			a, b, c
+		);
+	}
+	else
+	{
+		fprintf( stderr, "%d %d %5d - %2d %s - %d %s - %d %d %d\n",
+			library, file, line,
+			rc, ( rc == 0 ? "" : pintoRCToString( rc ) ),
+			errno, strerror( errno ),
+			a, b, c
+		);
+	}
+	fflush( stderr );
+}
+#endif
 

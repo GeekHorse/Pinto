@@ -32,9 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pinto_H
 
 /******************************************************************************/
-#include <stdlib.h> /* for size_t, in memory hook functions */
-
-/******************************************************************************/
 #define PINTO_NAME "Pinto"
 
 #define PINTO_COPYRIGHT "Copyright (C) 2012-2014 Jeremiah Martell"
@@ -49,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /******************************************************************************/
 /* This defines s32 as a signed 32-bit integer */
 #ifndef s32
-#define s32 int
+#define s32 signed int
 #endif
 /* This defines u8 as an unsigned 8-bit integer */
 #ifndef u8
@@ -109,21 +106,6 @@ typedef struct
 } PintoImage;
 
 typedef struct PintoText_STRUCT PintoText;
-
-/******************************************************************************/
-/* pintoHooks.c */
-/* These function pointers will be used by Pinto. You can use them to plug
-   Pinto into your own memory management system. */
-extern void *(*pintoHookMalloc)( size_t size );
-extern void *(*pintoHookCalloc)( size_t nmemb, size_t size );
-extern void *(*pintoHookRealloc)( void *ptr, size_t size );
-extern void (*pintoHookFree)( void *ptr );
-
-/* This function pointer is used by Pinto to log errors. Not really useful for
-   end-users of the library, but useful for developers. The default function
-   prints to stderr, but you can change this to plug Pinto into your own
-   logging system. */
-extern void (*pintoHookLog)( s32 library, s32 file, s32 line, s32 rc, s32 a, s32 b, s32 c );
 
 /******************************************************************************/
 /* pinto.c */

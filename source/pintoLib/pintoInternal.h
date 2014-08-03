@@ -32,42 +32,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pintoInternal_H
 
 /******************************************************************************/
-#include <stdio.h> /* for printf in ERR */
+#include <stdio.h> /* for printf, fprintf, fflush */
 #include <stdlib.h> /* for NULL */
+
+#include "pinto.h"
 
 /******************************************************************************/
 #define ERR_IF( cond, error_to_return ) \
 	if ( (cond) ) \
 	{ \
-		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, 0, 0, 0 ); \
+		PINTO_HOOK_LOG( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, 0, 0, 0 ); \
 		rc = error_to_return; \
 		goto cleanup; \
 	}
+
 #define ERR_IF_1( cond, error_to_return, a ) \
 	if ( (cond) ) \
 	{ \
-		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, 0, 0 ); \
+		PINTO_HOOK_LOG( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, 0, 0 ); \
 		rc = error_to_return; \
 		goto cleanup; \
 	}
+
 #define ERR_IF_2( cond, error_to_return, a, b ) \
 	if ( (cond) ) \
 	{ \
-		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, b, 0 ); \
+		PINTO_HOOK_LOG( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, b, 0 ); \
 		rc = error_to_return; \
 		goto cleanup; \
 	}
+
 #define ERR_IF_3( cond, error_to_return, a, b, c ) \
 	if ( (cond) ) \
 	{ \
-		pintoHookLog( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, b, c ); \
+		PINTO_HOOK_LOG( PINTO_LIBRARY_NUMBER, PINTO_FILE_NUMBER, __LINE__, error_to_return, a, b, c ); \
 		rc = error_to_return; \
 		goto cleanup; \
 	}
 
 #define ERR_IF_PASSTHROUGH \
 	ERR_IF( rc != PINTO_RC_SUCCESS, rc );
-
 
 /******************************************************************************/
 #ifdef BE_PARANOID
@@ -82,18 +86,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /******************************************************************************/
 #define PINTO_MALLOC( POINTER, POINTER_TYPE, SIZE ) \
-	POINTER = ( POINTER_TYPE * ) pintoHookMalloc( sizeof( POINTER_TYPE ) * (SIZE) ); \
+	POINTER = ( POINTER_TYPE * ) PINTO_HOOK_MALLOC( sizeof( POINTER_TYPE ) * (SIZE) ); \
 	ERR_IF( POINTER == NULL, PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED );
 
 /******************************************************************************/
 #define PINTO_CALLOC( POINTER, POINTER_TYPE, SIZE ) \
-	POINTER = ( POINTER_TYPE * ) pintoHookCalloc( SIZE, sizeof( POINTER_TYPE ) ); \
+	POINTER = ( POINTER_TYPE * ) PINTO_HOOK_CALLOC( SIZE, sizeof( POINTER_TYPE ) ); \
 	ERR_IF( POINTER == NULL, PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED );
 
 /******************************************************************************/
 #define PINTO_REALLOC( POINTER2, POINTER1, POINTER_TYPE, SIZE ) \
-	POINTER2 = ( POINTER_TYPE * ) pintoHookRealloc( POINTER1, sizeof( POINTER_TYPE ) * (SIZE) ); \
+	POINTER2 = ( POINTER_TYPE * ) PINTO_HOOK_REALLOC( POINTER1, sizeof( POINTER_TYPE ) * (SIZE) ); \
 	ERR_IF( POINTER2 == NULL, PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED );
+
+
 
 /******************************************************************************/
 /* Pinto's colors are reduced from 8-bits to 6-bits.
@@ -141,6 +147,65 @@ void pintoTextFreeAndGetString( PintoText **text_F, char **string_A );
 
 PINTO_RC pintoSimpleDeflate( PintoText **textToDeflate_F, PintoText **text_A );
 PINTO_RC pintoSimpleInflate( PintoText **textToInflate_F, PintoText **text_A );
+
+/******************************************************************************/
+#ifdef DEBUG
+
+	extern void *pintoHookMalloc( size_t size );
+	#ifndef PINTO_HOOK_MALLOC
+	#define PINTO_HOOK_MALLOC pintoHookMalloc
+	#endif
+
+	extern void *pintoHookCalloc( size_t nmemb, size_t size );
+	#ifndef PINTO_HOOK_CALLOC
+	#define PINTO_HOOK_CALLOC pintoHookCalloc
+	#endif
+
+	extern void *pintoHookRealloc( void *ptr, size_t size );
+	#ifndef PINTO_HOOK_REALLOC
+	#define PINTO_HOOK_REALLOC pintoHookRealloc
+	#endif
+
+	extern void pintoHookFree( void *ptr );
+	#ifndef PINTO_HOOK_FREE
+	#define PINTO_HOOK_FREE pintoHookFree
+	#endif
+
+#else
+
+	#ifndef PINTO_HOOK_MALLOC
+	#define PINTO_HOOK_MALLOC malloc
+	#endif
+
+	#ifndef PINTO_HOOK_CALLOC
+	#define PINTO_HOOK_CALLOC calloc
+	#endif
+
+	#ifndef PINTO_HOOK_REALLOC
+	#define PINTO_HOOK_REALLOC realloc
+	#endif
+
+	#ifndef PINTO_HOOK_FREE
+	#define PINTO_HOOK_FREE free
+	#endif
+
+#endif
+
+/******************************************************************************/
+#ifdef PINTO_ENABLE_LOGGING
+
+	extern void pintoHookLog( s32 library, s32 file, s32 line, s32 rc, s32 a, s32 b, s32 c );
+	#ifndef PINTO_HOOK_LOG
+	#define PINTO_HOOK_LOG( p, f, l, r, a, b, c ) pintoHookLog( p, f, l, r, a, b, c )
+	#endif
+
+#else
+
+	#ifndef PINTO_HOOK_LOG
+	#define PINTO_HOOK_LOG( p, f, l, r, a, b, c )
+	#endif
+
+#endif
 
 /******************************************************************************/
 #endif

@@ -56,8 +56,8 @@ const char valueToChar[ 64 ] = {
 /*!
 	\brief Initialize a text object.
 	\param[out] text_A The new text object.
-		Will be allocated with the pintoHook memory functions. Caller is
-		responsible for freeing by passing the text object to pintoTextFree().
+		Will be allocated. Caller is responsible for freeing by passing the text
+		object to pintoTextFree().
 	\return PINTO_RC
 */
 PINTO_RC pintoTextInit( PintoText **text_A )
@@ -90,10 +90,10 @@ PINTO_RC pintoTextInit( PintoText **text_A )
 
 	if ( newText != NULL )
 	{
-		pintoHookFree( newText->string );
+		PINTO_HOOK_FREE( newText->string );
 		newText->string = NULL;
 
-		pintoHookFree( newText );
+		PINTO_HOOK_FREE( newText );
 		newText = NULL;
 	}
 
@@ -104,7 +104,7 @@ PINTO_RC pintoTextInit( PintoText **text_A )
 /*!
 	\brief Frees a text object.
 	\param[in] text_F Text object to be freed. Will be freed with
-		pintoHookFree(). On return, text_F will be NULL.
+		PINTO_HOOK_FREE(). On return, text_F will be NULL.
 	\return void
 */
 void pintoTextFree( PintoText **text_F )
@@ -115,10 +115,10 @@ void pintoTextFree( PintoText **text_F )
 		return;
 	}
 
-	pintoHookFree( (*text_F)->string );
+	PINTO_HOOK_FREE( (*text_F)->string );
 	(*text_F)->string = NULL;
 
-	pintoHookFree( (*text_F) );
+	PINTO_HOOK_FREE( (*text_F) );
 	(*text_F) = NULL;
 
 	return;
@@ -562,7 +562,7 @@ PINTO_RC pintoTextUpdateValue( PintoText *text, s32 *value )
 	\brief Frees a text object and gives back old string.
 	\param[in] text Text.
 	\param[out] string_A Will be string of text. Caller is
-		responsible for freeing by passing to pintoHookFree().
+		responsible for freeing by passing to PINTO_HOOK_FREE().
 	\return void
 */
 void pintoTextFreeAndGetString( PintoText **text_F, char **string_A )
@@ -578,7 +578,7 @@ void pintoTextFreeAndGetString( PintoText **text_F, char **string_A )
 	(*string_A) = (*text_F)->string;
 	(*text_F)->string = NULL;
 
-	pintoHookFree( (*text_F) );
+	PINTO_HOOK_FREE( (*text_F) );
 	(*text_F) = NULL;
 
 	return;

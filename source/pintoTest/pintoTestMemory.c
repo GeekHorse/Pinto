@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PINTO_FILE_NUMBER 500
 
 /******************************************************************************/
-#include <string.h> /* strcmp */
-
 #include "pinto.h"
 #include "pintoInternal.h"
 
@@ -43,8 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static s32 failOnMallocCount = 0;
 static s32 currentMallocCount = 0;
 
-/* malloc/calloc/realloc that will always fail */
-static void *badMalloc( size_t size )
+void *pintoHookMalloc( size_t size )
 {
 	currentMallocCount += 1;
 	if ( currentMallocCount == failOnMallocCount )
@@ -55,7 +52,7 @@ static void *badMalloc( size_t size )
 	return malloc( size );
 }
 
-static void *badCalloc( size_t nmemb, size_t size )
+void *pintoHookCalloc( size_t nmemb, size_t size )
 {
 	currentMallocCount += 1;
 	if ( currentMallocCount == failOnMallocCount )
@@ -66,7 +63,7 @@ static void *badCalloc( size_t nmemb, size_t size )
 	return calloc( nmemb, size );
 }
 
-static void *badRealloc( void *ptr, size_t size )
+void *pintoHookRealloc( void *ptr, size_t size )
 {
 	currentMallocCount += 1;
 	if ( currentMallocCount == failOnMallocCount )
@@ -77,7 +74,13 @@ static void *badRealloc( void *ptr, size_t size )
 	return realloc( ptr, size );
 }
 
+void pintoHookFree( void *ptr )
+{
+	free( ptr );
+}
+
 /******************************************************************************/
+#ifdef DEBUG
 static PINTO_RC testFailedMallocs1( s32 test );
 static PINTO_RC testFailedMallocs2( s32 test );
 static PINTO_RC testFailedMallocs3( s32 test );
@@ -97,6 +100,7 @@ static FailedFunc failedFuncs[] =
 	{ testFailedMallocs4, 13 },
 	{ NULL, 0 }
 };
+#endif
 
 /******************************************************************************/
 int testMemory()
@@ -106,11 +110,13 @@ int testMemory()
 
 	int **iArray = NULL;
 
+#ifdef DEBUG
 	s32 i = 0;
 	s32 j = 0;
-
+	s32 flagAtLeastOneFailed = 0;
 	char *spinner = "-\\|/";
 	u8 spinnerI = 0;
+#endif
 
 	s32 OLD_PINTO_TEXT_SIZE_GROWTH = 0;
 
@@ -123,9 +129,15 @@ int testMemory()
 	/* testing bad mallocs */
 	printf( "  Testing bad mallocs...\n" ); fflush( stdout );
 
-	pintoHookMalloc = badMalloc;
-	pintoHookCalloc = badCalloc;
-	pintoHookRealloc = badRealloc;
+#ifndef DEBUG
+
+	printf( "\n\n\n" );
+	printf( "--- SKIPPING FAILED MALLOC TESTS! ------\n" );
+	printf( "You need to build a debug version of Pinto to test failed mallocs.\n" );
+	printf( "----------------------------------------\n" );
+	printf( "\n\n\n" );
+
+#else
 
 	OLD_PINTO_TEXT_SIZE_GROWTH = PINTO_TEXT_SIZE_GROWTH;
 	PINTO_TEXT_SIZE_GROWTH = 1;
@@ -137,6 +149,8 @@ int testMemory()
 		while ( j < failedFuncs[ i ].numberOfTests )
 		{
 			failOnMallocCount = 0;
+			spinnerI = 0;
+			flagAtLeastOneFailed = 0;
 
 			do
 			{
@@ -147,12 +161,23 @@ int testMemory()
 				failOnMallocCount += 1;
 
 				rc = failedFuncs[ i ].func( j );
+
+				if ( rc == PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED )
+				{
+					flagAtLeastOneFailed = 1;
+				}
 			}
 			while ( rc == PINTO_RC_ERROR_MEMORY_ALLOCATION_FAILED );
 
 			if ( rc != PINTO_RC_SUCCESS )
 			{
 				printf( "\nERROR: Expecting PINTO_RC_SUCCESS but got %s.\n", pintoRCToString( rc ) );
+				TEST_ERR_IF( 1 );
+			}
+
+			if ( flagAtLeastOneFailed == 0 )
+			{
+				printf( "There were no memory failures. There should have been at least 1.\n" );
 				TEST_ERR_IF( 1 );
 			}
 
@@ -164,20 +189,19 @@ int testMemory()
 		i += 1;
 	}
 
-	/* *** */
-	pintoHookCalloc = calloc;
-	pintoHookMalloc = malloc;
-	pintoHookRealloc = realloc;
+	failOnMallocCount = 0;
+#endif
 
+	/* *** */
 	PINTO_TEXT_SIZE_GROWTH = OLD_PINTO_TEXT_SIZE_GROWTH;
 
 	/* **************************************** */
 	/* test that calloc sets pointers to NULL */
 	printf( "  Testing calloc...\n" ); fflush( stdout );
-	iArray = (int **) pintoHookCalloc( 10, sizeof( int * ) );
+	iArray = (int **) PINTO_HOOK_CALLOC( 10, sizeof( int * ) );
 	TEST_ERR_IF( iArray == NULL );
 	TEST_ERR_IF( iArray[ 5 ] != NULL );
-	pintoHookFree( iArray );
+	PINTO_HOOK_FREE( iArray );
 
 
 	/* CLEANUP */
@@ -186,6 +210,7 @@ int testMemory()
 	return rc;
 }
 
+#ifdef DEBUG
 /******************************************************************************/
 static PINTO_RC testFailedMallocs1( s32 test )
 {
@@ -196,7 +221,6 @@ static PINTO_RC testFailedMallocs1( s32 test )
 	PintoImage *image1Downsized = NULL;
 	PintoImage *image2 = NULL;
 	char *encoding = NULL;
-
 
 
 	/* CODE */
@@ -226,10 +250,11 @@ static PINTO_RC testFailedMallocs1( s32 test )
 	rc = pintoImageDecodeString( encoding, &image2 );
 	ERR_IF_PASSTHROUGH;
 
+
 	/* CLEANUP */
 	cleanup:
 
-	pintoHookFree( encoding );
+	PINTO_HOOK_FREE( encoding );
 	pintoImageFree( &image1 );
 	pintoImageFree( &image2 );
 	pintoImageFree( &image1Downsized );
@@ -244,6 +269,7 @@ static PINTO_RC testFailedMallocs2( s32 test )
 	PINTO_RC rc = PINTO_RC_SUCCESS;
 
 	PintoText *text = NULL;
+
 
 	/* CODE */
 	(void)test;
@@ -308,6 +334,7 @@ static PINTO_RC testFailedMallocs3( s32 test )
 		"ABCDE002x003x004x005x006x007x008x009x010x011x012x013x014x015x016ABCDE"
 	};
 
+
 	/* CODE */
 	/* create textIn */
 	rc = pintoTextInit( &textIn );
@@ -369,12 +396,15 @@ static PINTO_RC testFailedMallocs4( s32 test )
 	rc = pintoImageDecodeString( encoding, &image2 );
 	ERR_IF_PASSTHROUGH;
 
+
 	/* CLEANUP */
 	cleanup:
 
-	pintoHookFree( encoding );
+	PINTO_HOOK_FREE( encoding );
 	pintoImageFree( &image1 );
 	pintoImageFree( &image2 );
 
 	return rc;
 }
+#endif
+

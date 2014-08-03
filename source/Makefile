@@ -1,4 +1,4 @@
-.PHONY: usage all fast small debug debug2 profile test vtest coverage clean pintoLib pintoTest
+.PHONY: usage all fast small debug debug2 debug3 profile test vtest coverage clean pintoLib pintoTest
 
 ARGS =
 
@@ -21,7 +21,11 @@ usage:
 	@echo "  fast     - build fast version"
 	@echo "  small    - build small version"
 	@echo "  debug    - build for debug"
-	@echo "  debug2   - build for debug that includes PARANOID checks"
+	@echo "  debug2   - build for debug, with necessary flags to"
+	@echo "             generate test coverage."
+	@echo "  debug3   - build for debug, with PARANOID checks,"
+	@echo "             PINTO_ENABLE_LOGGING, and necessary flags to"
+	@echo "             generate test coverage."
 	@echo "  profile  - build for profiling"
 	@echo "  test     - run tests"
 	@echo "  vtest    - run tests in valgrind"
@@ -36,20 +40,27 @@ fast: all
 small: ARGS = small
 small: all
 
+debug3: ARGS = debug3
+debug3: CFLAGS += -DPINTO_ENABLE_LOGGING
+debug3: CFLAGS += -DBE_PARANOID
+debug3: CFLAGS += -DDEBUG=3
+debug3: pintoLib pintoTest
+
 debug2: ARGS = debug2
-debug2: CFLAGS += -DBE_PARANOID
-debug2: all
+debug2: CFLAGS += -DDEBUG=2
+debug2: pintoLib pintoTest
 
 debug: ARGS = debug
-debug: all
+debug: CFLAGS += -DDEBUG=1
+debug: pintoLib pintoTest
 
 profile: ARGS = profile
 profile: all
 
-test: all
+test: pintoLib pintoTest
 	pintoTest/pintoTest -t all
 
-vtest: all
+vtest: pintoLib pintoTest
 	valgrind --leak-check=full pintoTest/pintoTest -t all
 
 coverage:
