@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	\file
 	Encoding and decoding functions.
 */
+#undef PINTO_FILE_NUMBER
 #define PINTO_FILE_NUMBER 1
 
 /******************************************************************************/

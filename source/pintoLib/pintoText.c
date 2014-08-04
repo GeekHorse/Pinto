@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	\file
 	Dynamic text structure functions.
 */
+#undef PINTO_FILE_NUMBER
 #define PINTO_FILE_NUMBER 2
 
 /******************************************************************************/

@@ -1,4 +1,4 @@
-.PHONY: usage all fast small debug debug2 debug3 profile test vtest coverage clean pintoLib pintoTest
+.PHONY: usage all fast small debug debug2 debug3 single singleFast singleSmall singleDebug singleCoverage profile test vtest coverage clean pintoLib pintoTest
 
 ARGS =
 
@@ -26,6 +26,7 @@ usage:
 	@echo "  debug3   - build for debug, with PARANOID checks,"
 	@echo "             PINTO_ENABLE_LOGGING, and necessary flags to"
 	@echo "             generate test coverage."
+	@echo "  single   - build a combined pintoSingle.c file"
 	@echo "  profile  - build for profiling"
 	@echo "  test     - run tests"
 	@echo "  vtest    - run tests in valgrind"
@@ -54,17 +55,33 @@ debug: ARGS = debug
 debug: CFLAGS += -DDEBUG=1
 debug: pintoLib pintoTest
 
+single: ARGS = single
+single: all
+
+singleFast: ARGS = singleFast
+singleFast: all
+
+singleSmall: ARGS = singleSmall
+singleSmall: all
+
+singleDebug: ARGS = singleDebug
+singleDebug: CFLAGS += -DDEBUG=1
+singleDebug: pintoLib pintoTest
+
 profile: ARGS = profile
 profile: all
 
-test: pintoLib pintoTest
+test: pintoTest
 	pintoTest/pintoTest -t all
 
-vtest: pintoLib pintoTest
+vtest:
 	valgrind --leak-check=full pintoTest/pintoTest -t all
 
 coverage:
 	cd pintoLib && $(MAKE) coverage
+
+singleCoverage:
+	cd pintoLib && $(MAKE) singleCoverage
 
 clean:
 	rm -rf html
@@ -74,13 +91,13 @@ clean:
 	cd utilities/rgbaToPinto && $(MAKE) clean
 	cd utilities/pintoToRgba && $(MAKE) clean
 
-rgbaToPinto: pintoLib
+rgbaToPinto:
 	cd utilities/rgbaToPinto && $(MAKE) $(ARGS)
 
-pintoToRgba: pintoLib
+pintoToRgba:
 	cd utilities/pintoToRgba && $(MAKE) $(ARGS)
 
-pintoTest: pintoLib
+pintoTest:
 	cd pintoTest && $(MAKE) $(ARGS)
 
 pintoLib:

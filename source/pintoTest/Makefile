@@ -1,4 +1,4 @@
-.PHONY: all fast small debug debug2 debug3 profile clean
+.PHONY: all fast small debug debug2 debug3 single singleSmall singleFast singleDebug profile clean
 
 CFLAGS += -I../pintoLib
 LDFLAGS += ../pintoLib/libPinto.a
@@ -21,6 +21,14 @@ debug2: LDFLAGS += -fprofile-arcs
 debug2: all
 
 debug: fast
+
+single: fast
+singleSmall: small
+singleFast: fast
+
+singleDebug: CFLAGS += -g
+singleDebug: LDFLAGS += -fprofile-arcs
+singleDebug: all
 
 profile: CFLAGS += -pg
 profile: LDFLAGS += -pg
