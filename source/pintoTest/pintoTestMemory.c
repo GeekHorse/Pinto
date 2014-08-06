@@ -80,7 +80,7 @@ void pintoHookFree( void *ptr )
 }
 
 /******************************************************************************/
-#ifdef DEBUG
+#ifdef PINTO_DEBUG
 static PINTO_RC testFailedMallocs1( s32 test );
 static PINTO_RC testFailedMallocs2( s32 test );
 static PINTO_RC testFailedMallocs3( s32 test );
@@ -110,7 +110,7 @@ int testMemory()
 
 	int **iArray = NULL;
 
-#ifdef DEBUG
+#ifdef PINTO_DEBUG
 	s32 i = 0;
 	s32 j = 0;
 	s32 flagAtLeastOneFailed = 0;
@@ -129,7 +129,7 @@ int testMemory()
 	/* testing bad mallocs */
 	printf( "  Testing bad mallocs...\n" ); fflush( stdout );
 
-#ifndef DEBUG
+#ifndef PINTO_DEBUG
 
 	printf( "\n\n\n" );
 	printf( "--- SKIPPING FAILED MALLOC TESTS! ------\n" );
@@ -210,7 +210,7 @@ int testMemory()
 	return rc;
 }
 
-#ifdef DEBUG
+#ifdef PINTO_DEBUG
 /******************************************************************************/
 static PINTO_RC testFailedMallocs1( s32 test )
 {

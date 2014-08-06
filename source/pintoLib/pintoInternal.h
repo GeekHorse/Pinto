@@ -149,7 +149,7 @@ PINTO_RC pintoSimpleDeflate( PintoText **textToDeflate_F, PintoText **text_A );
 PINTO_RC pintoSimpleInflate( PintoText **textToInflate_F, PintoText **text_A );
 
 /******************************************************************************/
-#ifdef DEBUG
+#ifdef PINTO_DEBUG
 
 	extern void *pintoHookMalloc( size_t size );
 	#ifndef PINTO_HOOK_MALLOC

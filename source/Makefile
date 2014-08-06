@@ -45,15 +45,15 @@ small: all
 debug3: ARGS = debug3
 debug3: CFLAGS += -DPINTO_ENABLE_LOGGING
 debug3: CFLAGS += -DBE_PARANOID
-debug3: CFLAGS += -DDEBUG=3
+debug3: CFLAGS += -DPINTO_DEBUG=3
 debug3: pintoLib pintoTest
 
 debug2: ARGS = debug2
-debug2: CFLAGS += -DDEBUG=2
+debug2: CFLAGS += -DPINTO_DEBUG=2
 debug2: pintoLib pintoTest
 
 debug: ARGS = debug
-debug: CFLAGS += -DDEBUG=1
+debug: CFLAGS += -DPINTO_DEBUG=1
 debug: pintoLib pintoTest
 
 single: ARGS = single
@@ -66,7 +66,7 @@ singleSmall: ARGS = singleSmall
 singleSmall: all
 
 singleDebug: ARGS = singleDebug
-singleDebug: CFLAGS += -DDEBUG=1
+singleDebug: CFLAGS += -DPINTO_DEBUG=1
 singleDebug: pintoLib pintoTest
 
 profile: ARGS = profile
