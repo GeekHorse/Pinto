@@ -85,6 +85,7 @@ PINTO_RC pintoImageEncode( const PintoImage *image, char **string_A )
 
 
 	/* PRECOND */
+	FAILURE_POINT;
 	ERR_IF( image == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( string_A == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( (*string_A) != NULL, PINTO_RC_ERROR_PRECOND );
@@ -391,6 +392,7 @@ PINTO_RC pintoImageDecodeString( const char *string, PintoImage **image_A )
 
 
 	/* PRECOND */
+	FAILURE_POINT;
 	ERR_IF( string == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( image_A == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( (*image_A) != NULL, PINTO_RC_ERROR_PRECOND );
@@ -460,6 +462,7 @@ PINTO_RC pintoImageDecodeText( PintoText **text_F, PintoImage **image_A )
 
 
 	/* PRECOND */
+	FAILURE_POINT;
 	ERR_IF( text_F == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( (*text_F) == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( image_A == NULL, PINTO_RC_ERROR_PRECOND );
@@ -692,6 +695,7 @@ PINTO_RC pintoImageInit( s32 width, s32 height, PintoImage **image_A )
 
 
 	/* PRECOND */
+	FAILURE_POINT;
 	ERR_IF_1( width <= 0 || width > PINTO_MAX_WIDTH, PINTO_RC_ERROR_PRECOND, width );
 	ERR_IF_1( height <= 0 || height > PINTO_MAX_HEIGHT, PINTO_RC_ERROR_PRECOND, height );
 	ERR_IF( image_A == NULL, PINTO_RC_ERROR_PRECOND );
@@ -774,6 +778,7 @@ PINTO_RC pintoSimpleDeflate( PintoText **textToDeflate_F, PintoText **text_A )
 
 
 	/* CODE */
+	FAILURE_POINT;
 	PARANOID_ERR_IF( textToDeflate_F == NULL );
 	PARANOID_ERR_IF( (*textToDeflate_F) == NULL );
 	PARANOID_ERR_IF( text_A == NULL );
@@ -943,6 +948,7 @@ PINTO_RC pintoSimpleInflate( PintoText **textToInflate_F, PintoText **text_A )
 
 
 	/* CODE */
+	FAILURE_POINT;
 	PARANOID_ERR_IF( textToInflate_F == NULL );
 	PARANOID_ERR_IF( (*textToInflate_F) == NULL );
 	PARANOID_ERR_IF( text_A == NULL );
@@ -1055,6 +1061,7 @@ PINTO_RC pintoImageDownsize( PintoImage *imageIn, PintoImage **imageOut_A )
 
 
 	/* PRECOND */
+	FAILURE_POINT;
 	ERR_IF( imageIn == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( imageOut_A == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( (*imageOut_A) != NULL, PINTO_RC_ERROR_PRECOND );
@@ -1159,6 +1166,7 @@ const char *pintoRCToString( PINTO_RC rc )
 		"Precondition Error",
 		"Memory Allocation Error",
 		"Standard Library Error",
+		"Failure Point Error",
 
 		"Image Bad Size Error",
 		"Image Too Many Colors Error",

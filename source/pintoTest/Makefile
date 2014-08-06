@@ -38,9 +38,9 @@ clean:
 	rm -f pintoTest
 	rm -f *.o
 
-pintoTest : $(OBJECTS) $(HEADERS) ../pintoLib/libPinto.a
+pintoTest: $(OBJECTS) $(HEADERS)
 	$(CC) *.o $(LDFLAGS) -o pintoTest
 
-%.o : %.c *.h
+%.o: %.c *.h
 	$(CC) $(CFLAGS) -c $<
 

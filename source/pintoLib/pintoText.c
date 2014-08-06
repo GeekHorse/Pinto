@@ -70,6 +70,7 @@ PINTO_RC pintoTextInit( PintoText **text_A )
 
 
 	/* CODE */
+	FAILURE_POINT;
 	ERR_IF( text_A == NULL, PINTO_RC_ERROR_PRECOND );
 	ERR_IF( (*text_A) != NULL, PINTO_RC_ERROR_PRECOND );
 
@@ -144,6 +145,7 @@ PINTO_RC pintoTextAddChar( PintoText *text, char ch )
 
 
 	/* CODE */
+	FAILURE_POINT;
 	ERR_IF( text == NULL, PINTO_RC_ERROR_PRECOND );
 
 	/* only add characters that are valid.
